@@ -38,6 +38,7 @@
   input:focus,select:focus,textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
   textarea{resize:vertical; min-height:56px;}
   label{display:block; font-size:12px; color:var(--ink2); margin-bottom:5px; font-weight:500;}
+  label .hint{display:block; font-size:11px; color:var(--ink3); font-weight:400; margin-top:2px; line-height:1.4;}
   .field{margin-bottom:14px;}
   button{font-family:var(--sans); cursor:pointer;}
 
@@ -795,15 +796,136 @@ function showTab(id){
   window.scrollTo({top:0, behavior:'instant'});
 }
 
-function fieldHtml(id, label, type, options, value){
+/* ---------------------------------------------------------------
+   FIELD HELP TEXT — short "what to do" subtitles under each label
+--------------------------------------------------------------- */
+const HINTS = {
+  'meta.docNo':'Auto-generated — leave as is unless your office uses its own numbering.',
+  'meta.client':'Name of the utility, cooperative, or IPP that owns this site.',
+  'meta.siteName':'The site\u2019s official or commonly-used name.',
+  'meta.rev':'Revision number of this survey record — start at 0.',
+  'meta.siteType':'Changes which sections appear below.',
+  's01.siteName':'Official or commonly-used name of the facility.',
+  's01.client':'The utility, cooperative, or IPP that owns/operates the site.',
+  's01.assetId':'Client\u2019s own internal code/asset tag, if they have one.',
+  's01.gps':'Lat/long taken at the main gate or control building.',
+  's01.address':'Street address, barangay/municipality, or a description anyone can navigate by.',
+  's01.surveyDate':'The date you conducted this survey.',
+  's01.engineers':'Names of the Controtek staff who conducted the survey.',
+  's01.siteContact':'Who on the client side can grant access or answer questions — include their role.',
+  's01.accessConstraints':'Gate codes, escort requirements, permits, or key custodian info.',
+  's01.lotoRequired':'Does the client require a formal permit-to-work / lockout-tagout before touching equipment?',
+  's01.accessWindow':'Hours or days the site can actually be accessed.',
+  's02.supplySource':'Where the station\u2019s own control/aux power comes from.',
+  's02.utilityProvider':'Which utility serves the site.',
+  's02.voltageLevels':'Low-voltage supply levels present for auxiliary loads.',
+  's02.controlVoltage':'DC or AC voltage used for control circuits — new equipment must match it.',
+  's02.upsPresent':'Is control power backed up? Note capacity and runtime.',
+  's02.standbyGenset':'Backup generator for the station itself, if any — note its rating.',
+  's02.sparePanel':'Room in the existing panel to add circuits without replacing it.',
+  's02.grounding':'Quick field assessment — good, marginal, or clearly deficient.',
+  's02.powerReliability':'How often does the site lose power, based on what you observe/hear?',
+  's03.rtuPresent':'Is there already a controller/RTU? Note make and model if so.',
+  's03.controlAge':'Rough age of the existing hardware.',
+  's03.spareIO':'Unused input/output points on the existing controller.',
+  's03.scadaHmi':'Software platform currently used to monitor/control the site remotely, if any.',
+  's03.scadaVendor':'Who currently maintains the SCADA system.',
+  's03.controlPhilosophy':'Is the site run manually, semi-automatically, or fully automatically today?',
+  's03.panelCondition':'Physical condition and ingress protection (IP) rating of the panel.',
+  's03.retainDecision':'Your preliminary call on what to do with the existing system.',
+  's04.internet':'Is there internet on site? Note the connection type (fiber, DSL, cellular, etc.).',
+  's04.lan':'Does a local network already exist? Note its IP scheme/subnet.',
+  's04.switchPorts':'Is there a managed switch with free ports to plug new gear into?',
+  's04.distanceCentral':'Distance from this site to the utility\u2019s control center.',
+  's04.fiber':'Is fiber connectivity present or planned between this site and others?',
+  's04.radioLos':'Does an unobstructed radio path to central look feasible?',
+  's04.protocols':'Communication protocols already running on site (DNP3, Modbus, IEC 61850, etc.).',
+  's04.telemetry':'How does data currently get off this site, if at all?',
+  's07.location':'Where would new equipment be installed?',
+  's07.ambientTemp':'Typical or extreme temperature range at the site.',
+  's07.humidity':'Is the site humid or prone to condensation?',
+  's07.dust':'Dust, chemicals, salt air, or other contaminants present.',
+  's07.hazArea':'Is there a classified hazardous area? Note zone/class if so.',
+  's07.cabinetSpace':'Physical room available to install new panels or devices.',
+  's07.cableRouting':'Existing conduit/tray to run new cables through, or none.',
+  's07.cooling':'Would a new panel need fans, AC, or heat-tracing here?',
+  'signal.recommended':'Your conclusion on which carrier to use for telemetry, based on the readings above.',
+  'safety.hazards':'Describe hazards observed or reported — moving equipment, live parts, chemicals, traffic, etc.',
+  'safety.confinedSpace':'Would any part of the work require entering a confined space?',
+  'safety.arcFlash':'Is there an arc-flash hazard nearby, and is the boundary/PPE signage posted?',
+  'sub.voltageClass':'Voltage levels the substation transforms or switches between.',
+  'sub.subType':'Transmission, sub-transmission, distribution, or pure switching.',
+  'sub.latitude':'Use the Scan button below, or enter manually if you have it.',
+  'sub.longitude':'Use the Scan button below, or enter manually if you have it.',
+  'sub.busConfig':'Busbar arrangement — affects switching logic and how many points need monitoring.',
+  'sub.numFeeders':'Count of outgoing feeders/bays — drives I/O count for automation scope.',
+  'sub.relayBrand':'Manufacturer(s) of the protection relays installed.',
+  'sub.relayModel':'Specific relay model number(s), for firmware/protocol lookup.',
+  'sub.relayComms':'Is there an accessible comms port on the relays?',
+  'sub.relayProtocol':'Protocol the relays speak — must be matched or gatewayed by new equipment.',
+  'sub.xfmrMonitoring':'What transformer health signals are already monitored, if any?',
+  'sub.breakerPoints':'What breaker status/control signals exist today, and where?',
+  'sub.existingRtu':'Is there already a remote terminal unit or automation platform here?',
+  'sub.linkToUtility':'Does this substation already report to the utility\u2019s control center?',
+  'sub.ptAnalog':'Rough count of analog signals expected — basis for I/O sizing.',
+  'sub.ptDigital':'Rough count of digital signals expected.',
+  'sub.ptControl':'Rough count of control points expected.',
+  'sub.notes':'Anything else worth flagging about this substation.',
+  'dist.feederName':'The feeder\u2019s identifying name or code as used by the utility.',
+  'dist.nominalVoltage':'The feeder\u2019s operating voltage.',
+  'dist.circuitConfig':'Radial, loop, or networked — affects switching/reconfiguration options.',
+  'dist.conductor':'Wire/cable type and gauge used.',
+  'dist.construction':'Overhead, underground, or a mix.',
+  'dist.lineLength':'How much of the feeder you actually walked/inspected.',
+  'dist.poleCondition':'Material and condition — flag any needing replacement.',
+  'dist.rowCondition':'Vegetation encroachment or other right-of-way issues.',
+  'dist.recloserLoc':'Where reclosers/sectionalizers sit along the feeder.',
+  'dist.capBankLoc':'Where capacitor banks sit, and whether fixed or switched.',
+  'dist.regulatorLoc':'Where voltage regulators are installed along the feeder.',
+  'dist.xfmrCount':'Number of distribution transformers in the surveyed section.',
+  'dist.faultIndicators':'Are fault indicators already installed?',
+  'dist.flisr':'Is Fault Location, Isolation, and Service Restoration already deployed here?',
+  'dist.amiPenetration':'What proportion of customers have smart meters?',
+  'dist.loadProfile':'Any load/peak demand data the client can provide.',
+  'dist.outageHistory':'Recurring trouble spots or outage patterns reported by the client.',
+  'gen.facilityType':'The generation technology in use — shapes the rest of this section.',
+  'gen.capacity':'Total nameplate capacity of the facility.',
+  'gen.numUnits':'How many individual generating units make up the facility.',
+  'gen.primeMover':'The engine/driver turning the generator.',
+  'gen.fuelType':'What fuel or energy source the plant runs on.',
+  'gen.genVoltage':'Voltage at the generator\u2019s own terminals, before step-up.',
+  'gen.stepUpXfmr':'Rating and voltage ratio of the step-up transformer, if present.',
+  'gen.gridPoint':'Where and at what voltage the facility connects to the grid.',
+  'gen.excitation':'How the generator\u2019s field excitation is controlled.',
+  'gen.governor':'How the prime mover\u2019s speed (and frequency) is controlled.',
+  'gen.sync':'Does synchronizing equipment already exist, manual or automatic?',
+  'gen.avr':'Is an automatic voltage regulator installed?',
+  'gen.genRelay':'Brand/model of the relay protecting the generator itself.',
+  'gen.blackstart':'Can the unit start without an external power source?',
+  'gen.dispatch':'How is the unit normally operated?',
+  'gen.fuelStorage':'How much fuel is on hand, and runtime at full load.',
+  'gen.emissions':'Is continuous emissions monitoring or other compliance equipment installed?',
+  'gen.cooling':'How is the unit cooled?',
+  'gen.plantScada':'The plant\u2019s existing control system/SCADA platform, if any.',
+  'gen.loadSharing':'Can multiple units share load automatically when running in parallel?',
+  'gen.ats':'For standby units — is there an automatic transfer switch?',
+  'gen.totalUnits':'How many generating units the client operates across all sites.',
+  'signoff.surveyedBy':'Controtek engineer(s) who conducted the survey.',
+  'signoff.reviewedBy':'Internal reviewer who checked the survey before use.',
+  'signoff.clientRep':'Client-side person who witnessed/agrees with the findings, if available.',
+};
+function HINT(ns,key){ return HINTS[ns+'.'+key] || ''; }
+
+function fieldHtml(id, label, type, options, value, hint){
   value = value==null? '' : value;
+  const hintHtml = hint? `<span class="hint">${hint}</span>` : '';
   if(type==='select'){
-    return `<div class="field"><label>${label}</label><select data-bind="${id}"><option value="">—</option>${options.map(o=>`<option value="${o}" ${o===value?'selected':''}>${o}</option>`).join('')}</select></div>`;
+    return `<div class="field"><label>${label}${hintHtml}</label><select data-bind="${id}"><option value="">—</option>${options.map(o=>`<option value="${o}" ${o===value?'selected':''}>${o}</option>`).join('')}</select></div>`;
   }
   if(type==='textarea'){
-    return `<div class="field" style="grid-column:1/-1;"><label>${label}</label><textarea data-bind="${id}">${escapeHtml(value)}</textarea></div>`;
+    return `<div class="field" style="grid-column:1/-1;"><label>${label}${hintHtml}</label><textarea data-bind="${id}">${escapeHtml(value)}</textarea></div>`;
   }
-  return `<div class="field"><label>${label}</label><input type="${type}" data-bind="${id}" value="${escapeHtml(value)}"></div>`;
+  return `<div class="field"><label>${label}${hintHtml}</label><input type="${type}" data-bind="${id}" value="${escapeHtml(value)}"></div>`;
 }
 
 function bindSection(container, getObj, setDirty){
@@ -834,11 +956,11 @@ function renderOverview(){
     </div>`;
   const metaGrid = el.querySelector('#metaGrid');
   metaGrid.innerHTML = [
-    fieldHtml('docNo','Document number','text',null,state.meta.docNo),
-    fieldHtml('client','Client / utility / IPP','text',null,state.meta.client),
-    fieldHtml('siteName','Site / station name','text',null,state.meta.siteName),
-    fieldHtml('rev','Revision','text',null,state.meta.rev),
-    fieldHtml('siteType','Power utility type','select',['Generation','Transmission','Distribution'],state.meta.siteType),
+    fieldHtml('docNo','Document number','text',null,state.meta.docNo,HINT('meta','docNo')),
+    fieldHtml('client','Client / utility / IPP','text',null,state.meta.client,HINT('meta','client')),
+    fieldHtml('siteName','Site / station name','text',null,state.meta.siteName,HINT('meta','siteName')),
+    fieldHtml('rev','Revision','text',null,state.meta.rev,HINT('meta','rev')),
+    fieldHtml('siteType','Power utility type','select',['Generation','Transmission','Distribution'],state.meta.siteType,HINT('meta','siteType')),
   ].join('');
   metaGrid.querySelectorAll('[data-bind]').forEach(elm=>{
     elm.addEventListener('input', ()=>{
@@ -874,7 +996,7 @@ function renderCore(){
     return `<div class="card" data-sec="${key}">
       <h2><span class="tag">${sec.no}</span> ${sec.title}</h2>
       <p class="desc">${sec.desc}</p>
-      <div class="grid2">${sec.fields.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.core[key][f[0]])).join('')}</div>
+      <div class="grid2">${sec.fields.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.core[key][f[0]],HINT(key,f[0]))).join('')}</div>
     </div>`;
   }).join('');
   ['s01','s02','s03','s04'].forEach(key=>{
@@ -896,7 +1018,7 @@ function renderSignal(){
       <td><input data-f="dbm" value="${escapeHtml(state.signal[c].dbm)}" placeholder="-95"></td>
       <td><input data-f="loc" value="${escapeHtml(state.signal[c].loc)}" placeholder="Proposed panel location"></td>
     </tr>`).join('')}</tbody></table>
-    <div class="field" style="margin-top:16px;"><label>Recommended provider for this site</label>
+    <div class="field" style="margin-top:16px;"><label>Recommended provider for this site<span class="hint">${HINT('signal','recommended')}</span></label>
     <input id="signalRec" value="${escapeHtml(state.signalRecommended)}"></div>
   </div>`;
   el.querySelectorAll('tr[data-carrier] input').forEach(inp=>{
@@ -950,7 +1072,7 @@ function renderEnv(){
   el.innerHTML = `<div class="card" data-sec="s07">
     <h2><span class="tag">07</span> ${sec.title}</h2>
     <p class="desc">${sec.desc}</p>
-    <div class="grid2">${sec.fields.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.core.s07[f[0]])).join('')}</div>
+    <div class="grid2">${sec.fields.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.core.s07[f[0]],HINT('s07',f[0]))).join('')}</div>
   </div>`;
   bindSection(el.querySelector('[data-sec="s07"]'), ()=>state.core.s07);
 }
@@ -963,9 +1085,9 @@ function renderSafety(){
     <p class="desc">PPE required and hazards observed on site.</p>
     <div>${SAFETY_ITEMS.map(item=>`<label class="checkrow"><input type="checkbox" data-ppe="${item}" ${state.safety.checked[item]?'checked':''}><span class="lbl">${item}</span></label>`).join('')}</div>
     <div class="grid2" style="margin-top:16px;">
-      <div class="field" style="grid-column:1/-1;"><label>Site hazards (narrative)</label><textarea id="hazards">${escapeHtml(state.safety.hazards)}</textarea></div>
-      <div class="field"><label>Confined-space entry involved</label><select id="confined"><option value="">—</option><option ${state.safety.confinedSpace==='Yes'?'selected':''}>Yes</option><option ${state.safety.confinedSpace==='No'?'selected':''}>No</option></select></div>
-      <div class="field"><label>Arc-flash risk / boundary posted</label><select id="arcflash"><option value="">—</option><option ${state.safety.arcFlash==='Yes'?'selected':''}>Yes</option><option ${state.safety.arcFlash==='No'?'selected':''}>No</option></select></div>
+      <div class="field" style="grid-column:1/-1;"><label>Site hazards (narrative)<span class="hint">${HINT('safety','hazards')}</span></label><textarea id="hazards">${escapeHtml(state.safety.hazards)}</textarea></div>
+      <div class="field"><label>Confined-space entry involved<span class="hint">${HINT('safety','confinedSpace')}</span></label><select id="confined"><option value="">—</option><option ${state.safety.confinedSpace==='Yes'?'selected':''}>Yes</option><option ${state.safety.confinedSpace==='No'?'selected':''}>No</option></select></div>
+      <div class="field"><label>Arc-flash risk / boundary posted<span class="hint">${HINT('safety','arcFlash')}</span></label><select id="arcflash"><option value="">—</option><option ${state.safety.arcFlash==='Yes'?'selected':''}>Yes</option><option ${state.safety.arcFlash==='No'?'selected':''}>No</option></select></div>
     </div>
   </div>`;
   el.querySelectorAll('[data-ppe]').forEach(cb=>{
@@ -1028,7 +1150,7 @@ function renderSubList(){
         <span class="chev">▶</span>
       </div>
       <div class="sbody">
-        <div class="grid2">${SUBSTATION_FIELDS.map(f=>fieldHtml('f-'+f[0],f[1],f[2],f[3],s.data[f[0]])).join('')}</div>
+        <div class="grid2">${SUBSTATION_FIELDS.map(f=>fieldHtml('f-'+f[0],f[1],f[2],f[3],s.data[f[0]],HINT('sub',f[0]))).join('')}</div>
         <div style="margin:-8px 0 16px;">
           <button class="btn small" data-gps="${i}" type="button">📍 Scan current location</button>
           <span id="gpsHint-${i}" style="display:inline-block;margin-left:10px;font-size:11.5px;color:var(--ink3);"></span>
@@ -1139,7 +1261,7 @@ function renderDistribution(){
   el.innerHTML = `<div class="card">
     <h2><span class="tag">10</span> Distribution Feeder &amp; Line Survey</h2>
     <p class="desc">Complete for overhead/underground distribution line and feeder-level surveys.</p>
-    <div class="grid2">${DIST_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.distribution.fields[f[0]])).join('')}</div>
+    <div class="grid2">${DIST_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.distribution.fields[f[0]],HINT('dist',f[0]))).join('')}</div>
   </div>`;
   bindSection(el, ()=>state.distribution.fields);
 }
@@ -1150,7 +1272,7 @@ function renderGeneration(){
   el.innerHTML = `<div class="card">
     <h2><span class="tag">11</span> Power Generation Details</h2>
     <p class="desc">Complete for generating stations — utility-scale plants or standby/backup generators.</p>
-    <div class="grid2">${GEN_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.generation.fields[f[0]])).join('')}</div>
+    <div class="grid2">${GEN_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.generation.fields[f[0]],HINT('gen',f[0]))).join('')}</div>
     <div style="margin-top:6px;">
       <label style="margin-bottom:8px;">Generator / unit inventory</label>
       <table class="dyn"><thead><tr><th>Unit tag</th><th>Rating</th><th>Prime mover</th><th>Fuel</th><th>Status</th><th>Notes</th><th></th></tr></thead>
@@ -1196,9 +1318,9 @@ function renderCloseout(){
   <div class="card">
     <h2><span class="tag">B</span> Sign-off</h2>
     <div class="grid3">
-      ${fieldHtml('surveyedBy','Surveyed by','text',null,state.signoff.surveyedBy)}
-      ${fieldHtml('reviewedBy','Reviewed by','text',null,state.signoff.reviewedBy)}
-      ${fieldHtml('clientRep','Client representative','text',null,state.signoff.clientRep)}
+      ${fieldHtml('surveyedBy','Surveyed by','text',null,state.signoff.surveyedBy,HINT('signoff','surveyedBy'))}
+      ${fieldHtml('reviewedBy','Reviewed by','text',null,state.signoff.reviewedBy,HINT('signoff','reviewedBy'))}
+      ${fieldHtml('clientRep','Client representative','text',null,state.signoff.clientRep,HINT('signoff','clientRep'))}
     </div>
   </div>`;
   el.querySelectorAll('.card:last-child [data-bind]').forEach(inp=>{
