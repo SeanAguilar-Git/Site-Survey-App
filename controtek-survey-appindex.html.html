@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controtek — Site Survey Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  :root{
+    --bg:#FAFAF9;
+    --panel:#FFFFFF;
+    --panel2:#F6F6F5;
+    --line:#E4E3E0;
+    --line-soft:#EDECE9;
+    --accent:#2E7D6E;
+    --accent-soft:#EAF3F0;
+    --amber:#C77A28;
+    --red:#C4453D;
+    --green:#2E7D6E;
+    --ink:#242422;
+    --ink2:#6E6D68;
+    --ink3:#A3A29C;
+    --mono:'Inter',system-ui,sans-serif;
+    --sans:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);}
+  ::selection{background:var(--accent-soft);color:var(--ink);}
+  a{color:var(--accent);}
+  input,select,textarea{
+    font-family:var(--sans); background:var(--panel); color:var(--ink);
+    border:1px solid var(--line); border-radius:6px; padding:9px 10px; font-size:13.5px;
+    width:100%; outline:none; transition:border-color .12s;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+  textarea{resize:vertical; min-height:56px;}
+  label{display:block; font-size:12px; color:var(--ink2); margin-bottom:5px; font-weight:500;}
+  .field{margin-bottom:14px;}
+  button{font-family:var(--sans); cursor:pointer;}
+
+  #topbar{
+    position:sticky; top:0; z-index:50; background:rgba(250,250,249,.92); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line); padding:14px 24px; display:flex; align-items:center; gap:16px;
+  }
+  #topbar .brand{font-size:12px; color:var(--ink3); white-space:nowrap;}
+  #topbar .title{font-weight:600; font-size:15px; white-space:nowrap;}
+  #docno{font-size:12.5px; color:var(--ink2); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .status{font-size:11.5px; color:var(--ink3); white-space:nowrap; min-width:110px; text-align:right;}
+  .status.saving{color:var(--amber);}
+  .status.saved{color:var(--accent);}
+
+  .btn{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink2);
+    padding:8px 14px; border-radius:6px; font-size:13px; font-weight:500;
+    display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .btn:hover{border-color:var(--ink3); color:var(--ink);}
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .btn.primary:hover{opacity:.92;}
+  .btn.danger{color:var(--red);}
+  .btn.small{padding:6px 11px; font-size:12px;}
+
+  #shell{max-width:880px; margin:0 auto; padding:28px 24px 80px;}
+
+  #gate{max-width:440px; margin:12vh auto; text-align:center; padding:0 20px;}
+  #gate .mark{color:var(--ink3); font-size:12px; letter-spacing:.04em; margin-bottom:12px; text-transform:uppercase;}
+  #gate h1{font-size:26px; font-weight:600; margin:0 0 8px;}
+  #gate p{color:var(--ink2); font-size:14px; margin:0 0 28px; line-height:1.6;}
+  #gate .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:24px; text-align:left; box-shadow:0 1px 3px rgba(0,0,0,.03);}
+  #gate .row{display:flex; gap:10px; margin-top:16px;}
+  #recent{margin-top:24px; text-align:left;}
+  #recent .item{
+    display:flex; justify-content:space-between; align-items:center; padding:12px 14px;
+    border:1px solid var(--line); border-radius:8px; margin-bottom:8px; background:var(--panel);
+    cursor:pointer; font-size:13.5px;
+  }
+  #recent .item:hover{border-color:var(--accent);}
+  #recent .item .id{color:var(--accent); font-size:12px; font-weight:500;}
+  #recent .item .nm{color:var(--ink2); font-size:12px; margin-top:2px;}
+
+  nav#tabs{display:flex; gap:4px; margin:0 0 24px; overflow-x:auto; padding-bottom:2px;}
+  nav#tabs button{
+    background:none; border:none; color:var(--ink2); padding:9px 14px; font-size:13px; font-weight:500;
+    border-radius:6px; white-space:nowrap;
+  }
+  nav#tabs button .n{display:none;}
+  nav#tabs button.active{color:#fff; background:var(--accent);}
+  nav#tabs button:hover:not(.active){background:var(--panel2); color:var(--ink);}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:22px 24px; margin-bottom:16px;}
+  .card h2{font-size:15px; margin:0 0 4px; font-weight:600; display:flex; align-items:center; gap:9px;}
+  .card h2 .tag{font-size:11px; color:var(--accent); background:var(--accent-soft); padding:2px 8px; border-radius:5px; font-weight:600;}
+  .card .desc{font-size:13px; color:var(--ink2); margin:0 0 18px; line-height:1.55;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:0 16px;}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:0 16px;}
+  @media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+  .checkrow{display:flex; align-items:flex-start; gap:9px; padding:9px 0; font-size:13.5px; border-bottom:1px solid var(--line-soft);}
+  .checkrow:last-child{border-bottom:none;}
+  .checkrow input[type=checkbox]{width:16px; height:16px; margin-top:1px; accent-color:var(--accent); flex:none;}
+  .checkrow .lbl{flex:1;}
+  .checkrow .lbl .hint{display:block; color:var(--ink3); font-size:11.5px; margin-top:1px;}
+
+  table.dyn{width:100%; border-collapse:collapse; margin-top:4px;}
+  table.dyn th{
+    color:var(--ink2); font-size:11px; text-align:left; padding:8px 8px; border-bottom:1px solid var(--line); font-weight:600;
+  }
+  table.dyn td{padding:5px 8px 5px 0; border-bottom:1px solid var(--line-soft); vertical-align:top;}
+  table.dyn td input,table.dyn td select{padding:7px 8px; font-size:13px;}
+  table.dyn .rm{background:none; border:none; color:var(--ink3); font-size:16px; line-height:1; padding:4px;}
+  table.dyn .rm:hover{color:var(--red);}
+  .addrow{margin-top:8px;}
+
+  .subwrap{margin-top:6px;}
+  .substation{
+    border:1px solid var(--line); border-radius:10px; margin-bottom:12px; overflow:hidden; background:var(--panel);
+  }
+  .substation .shead{
+    display:flex; align-items:center; gap:10px; padding:13px 16px; cursor:pointer; user-select:none;
+  }
+  .substation .shead:hover{background:var(--panel2);}
+  .substation .shead .idx{color:var(--accent); background:var(--accent-soft); font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:5px;}
+  .substation .shead .nm{flex:1; font-weight:600; font-size:14px;}
+  .substation .shead .nm input{background:transparent; border:none; padding:2px 0; font-weight:600; font-size:14px;}
+  .substation .shead .nm input:focus{background:var(--panel2); border-radius:5px; padding:2px 6px; box-shadow:none;}
+  .substation .shead .meta{font-size:12px; color:var(--ink3);}
+  .substation .shead .chev{color:var(--ink3); font-size:12px; transition:transform .15s;}
+  .substation.open .chev{transform:rotate(90deg);}
+  .substation .sbody{display:none; padding:18px 18px 8px; border-top:1px solid var(--line);}
+  .substation.open .sbody{display:block;}
+
+  .countbar{
+    display:flex; align-items:center; flex-wrap:wrap; gap:14px; background:var(--panel2); border:1px solid var(--line);
+    border-radius:10px; padding:16px 18px; margin-bottom:18px;
+  }
+  .countbar .lbl2{font-size:13.5px; font-weight:600; flex:1;}
+  .countbar input[type=number]{width:80px; text-align:center; font-weight:600; color:var(--accent);}
+  .countbar .hint2{font-size:12px; color:var(--ink3); width:100%; margin-top:2px;}
+
+  .progress-wrap{margin-bottom:18px;}
+  .progress-track{height:6px; background:var(--line-soft); border-radius:4px; overflow:hidden;}
+  .progress-fill{height:100%; background:var(--accent); transition:width .25s;}
+  .progress-label{font-size:12px; color:var(--ink2); margin-top:8px; display:flex; justify-content:space-between;}
+
+  .sectionlist{display:flex; flex-direction:column; gap:6px; margin-top:8px;}
+  .sectionlist a{
+    display:flex; align-items:center; gap:10px; padding:11px 14px; border:1px solid var(--line); border-radius:8px;
+    color:var(--ink); font-size:13.5px; text-decoration:none; background:var(--panel);
+  }
+  .sectionlist a:hover{border-color:var(--accent); background:var(--accent-soft);}
+  .sectionlist a .num{color:var(--accent); font-size:11.5px; font-weight:600; width:34px;}
+  .sectionlist a .cnt{margin-left:auto; font-size:11.5px; color:var(--ink3);}
+
+  footer{max-width:880px; margin:0 auto; padding:0 24px 40px; color:var(--ink3); font-size:11.5px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+
+  #toast{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px); opacity:0;
+    background:var(--ink); color:#fff; padding:10px 18px;
+    border-radius:8px; font-size:13px; pointer-events:none; transition:all .2s; z-index:100;
+  }
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  /* ---------------- Mobile bottom bar / action sheet ---------------- */
+  #mobileBar{
+    display:none; position:fixed; left:0; right:0; bottom:0; z-index:60;
+    background:var(--panel); border-top:1px solid var(--line);
+    padding:6px calc(6px + env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left));
+    gap:4px; box-shadow:0 -2px 10px rgba(0,0,0,.04);
+  }
+  #mobileBar .mbtn{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    background:none; border:none; color:var(--ink2); font-size:11px; font-weight:600; padding:9px 4px; border-radius:10px;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #mobileBar .mbtn .ic{font-size:19px; line-height:1;}
+  #mobileBar .mbtn.primary{color:var(--accent);}
+  #mobileBar .mbtn:active{background:var(--panel2);}
+  #sheetBackdrop{display:none; position:fixed; inset:0; background:rgba(20,20,18,.32); z-index:65;}
+  #sheetBackdrop.open{display:block;}
+  #mobileMoreSheet{
+    display:none; flex-direction:column; gap:2px; position:fixed; left:12px; right:12px;
+    bottom:calc(76px + env(safe-area-inset-bottom)); z-index:70; background:var(--panel);
+    border:1px solid var(--line); border-radius:16px; padding:8px; box-shadow:0 12px 34px rgba(0,0,0,.18);
+  }
+  #mobileMoreSheet.open{display:flex;}
+  .sheetbtn{
+    text-align:left; padding:14px 14px; border-radius:11px; border:none; background:none;
+    font-size:15px; font-weight:500; color:var(--ink); -webkit-tap-highlight-color:transparent;
+  }
+  .sheetbtn:active{background:var(--panel2);}
+  .sheetbtn.danger{color:var(--red);}
+  .sheetbtn.ghost{color:var(--ink3); text-align:center; margin-top:4px; border-top:1px solid var(--line-soft); padding-top:13px; font-weight:600;}
+
+  @media(max-width:760px){
+    body.app-open #mobileBar{display:flex;}
+    body.app-open #shell{padding-bottom:96px;}
+    #topbar .btn{display:none;}
+    #topbar{padding:11px 14px; gap:10px;}
+    #topbar .brand{display:none;}
+    #topbar .title{font-size:14px;}
+    #docno{font-size:11.5px;}
+    #shell{padding:18px 14px 40px;}
+    .card{padding:17px 16px; border-radius:12px;}
+    .card h2{font-size:14.5px;}
+    input,select,textarea{font-size:16px; padding:10px 11px;}
+    nav#tabs{gap:6px; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; margin:0 0 18px;}
+    nav#tabs button{padding:10px 15px; font-size:13.5px; scroll-snap-align:start;}
+    .checkrow{padding:12px 0; font-size:14.5px;}
+    .checkrow input[type=checkbox]{width:20px; height:20px;}
+    .substation .shead{padding:14px 14px;}
+    .substation .shead .nm,.substation .shead .nm input{font-size:14.5px;}
+    .countbar{flex-direction:column; align-items:stretch; gap:8px;}
+    .countbar input[type=number]{width:100%; font-size:16px; padding:10px;}
+    table.dyn{display:block; overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:8px;}
+    table.dyn thead,table.dyn tbody{display:table; width:100%; min-width:560px;}
+    #gate{margin:9vh auto; padding:0 16px;}
+    #gate h1{font-size:23px;}
+    #gate .card{padding:20px;}
+  }
+
+
+  @media print{
+    #topbar,nav#tabs,.btn,.addrow,.rm,#toast,.countbar .hint2,#mobileBar,#mobileMoreSheet,#sheetBackdrop{display:none !important;}
+    body{background:#fff; color:#000;}
+    .panel{display:block !important;}
+    .card{border:1px solid #ccc; page-break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="mark">Controtek Solutions</div>
+  <h1>Site Survey Checklist</h1>
+  <p>Power Generation, Transmission &amp; Distribution — fill it out on site, it saves itself.</p>
+  <div class="card">
+    <div class="field">
+      <label>Client / utility / IPP name</label>
+      <input id="gateClient" placeholder="e.g. Laguna Electric Cooperative">
+    </div>
+    <div class="field">
+      <label>Site / station name</label>
+      <input id="gateSite" placeholder="e.g. Biñan Substation">
+    </div>
+    <div class="field">
+      <label>Power utility type</label>
+      <select id="gateType">
+        <option value="">Select type…</option>
+        <option value="Generation">Generation</option>
+        <option value="Transmission">Transmission</option>
+        <option value="Distribution">Distribution</option>
+      </select>
+    </div>
+    <div class="row">
+      <button class="btn primary" id="gateStart" style="flex:1; justify-content:center; padding:10px;">Start survey</button>
+    </div>
+  </div>
+  <div style="margin-top:16px; text-align:center;">
+    <span style="font-size:12.5px; color:var(--ink3);">Have a saved survey file?</span>
+    <button class="btn small" id="gateImportBtn" style="margin-left:8px;">Import saved file</button>
+    <input type="file" id="gateImportFile" accept="application/json,.json,application/pdf,.pdf" style="display:none;">
+    <div style="font-size:11px; color:var(--ink3); margin-top:6px;">Accepts .json (exact) or a .pdf saved from this checklist (best effort — see note after import).</div>
+  </div>
+  <div id="recent"></div>
+</div>
+
+<div id="app" style="display:none;">
+  <div id="topbar">
+    <div class="brand">Controtek</div>
+    <div class="title">Site Survey</div>
+    <div id="docno">—</div>
+    <div class="status" id="saveStatus">idle</div>
+    <button class="btn small primary" id="btnSave">Save survey</button>
+    <button class="btn small" id="btnHome">Home</button>
+    <button class="btn small" id="btnExport">Save file (.json)</button>
+    <button class="btn small" id="btnPrint">Print / PDF</button>
+    <button class="btn small danger" id="btnClear">Clear form</button>
+  </div>
+
+  <div id="shell">
+    <nav id="tabs"></nav>
+    <div id="panels"></div>
+  </div>
+
+  <footer>
+    <span>Data is stored in this browser session's persistent storage — not emailed or uploaded elsewhere.</span>
+    <span id="footRev">rev 0</span>
+  </footer>
+</div>
+
+<div id="sheetBackdrop"></div>
+<div id="mobileMoreSheet">
+  <button class="sheetbtn" id="mExport">📄 Save file (.json)</button>
+  <button class="sheetbtn" id="mPrint">🖨️ Print / PDF</button>
+  <button class="sheetbtn danger" id="mClear">🗑️ Clear form</button>
+  <button class="sheetbtn ghost" id="mCloseSheet">Cancel</button>
+</div>
+<div id="mobileBar">
+  <button class="mbtn primary" id="mSave"><span class="ic">💾</span><span>Save</span></button>
+  <button class="mbtn" id="mHome"><span class="ic">🏠</span><span>Home</span></button>
+  <button class="mbtn" id="mMore"><span class="ic">⋯</span><span>More</span></button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ---------------------------------------------------------------
+   DATA MODEL
+--------------------------------------------------------------- */
+const CORE_FIELDS = {
+  s01:{no:'01',title:'Site Identification & Logistics',desc:'Baseline information for every survey.',fields:[
+    ['siteName','Site / station name','text'],
+    ['client','Client / utility / IPP','text'],
+    ['assetId','Client site or asset ID','text'],
+    ['gps','GPS coordinates (lat, long)','text'],
+    ['address','Address / locality','text'],
+    ['surveyDate','Survey date','date'],
+    ['engineers','Engineers present','text'],
+    ['siteContact','Site contact — name / role / number','text'],
+    ['accessConstraints','Access constraints','textarea'],
+    ['lotoRequired','Permit-to-work / LOTO required','select',['Yes','No']],
+    ['accessWindow','Workable hours / access window','text'],
+  ]},
+  s02:{no:'02',title:'Power & Electrical',desc:'The site\u2019s own auxiliary/control power supply.',fields:[
+    ['supplySource','Main supply source','select',['Utility grid','Genset','Solar','Dual','Other']],
+    ['utilityProvider','Utility / electric provider','text'],
+    ['voltageLevels','Voltage levels available','text'],
+    ['controlVoltage','Control voltage','text'],
+    ['upsPresent','UPS present — capacity / runtime','text'],
+    ['standbyGenset','Standby genset present — rating','text'],
+    ['sparePanel','Spare breakers / free panel space','text'],
+    ['grounding','Earthing / grounding condition','select',['Good','Marginal','Deficient','Unknown']],
+    ['powerReliability','Power reliability / outage frequency','text'],
+  ]},
+  s03:{no:'03',title:'Existing Control & Automation',desc:'What control system is already on site.',fields:[
+    ['rtuPresent','Existing controller / RTU — brand & model','text'],
+    ['controlAge','Approx. age of control system','text'],
+    ['spareIO','Spare I/O available','text'],
+    ['scadaHmi','Existing SCADA / HMI (brand & version)','text'],
+    ['scadaVendor','SCADA support vendor','text'],
+    ['controlPhilosophy','Current control philosophy','select',['Manual','Semi-automatic','Automatic']],
+    ['panelCondition','Panel condition & IP rating','text'],
+    ['retainDecision','Retain / integrate / replace decision','select',['Retain','Integrate','Replace','TBD']],
+  ]},
+  s04:{no:'04',title:'Communications & Networking',desc:'How the site talks to a central control room.',fields:[
+    ['internet','Internet available — connection type','text'],
+    ['lan','Existing LAN — IP scheme / subnet','text'],
+    ['switchPorts','Managed switch & spare ports','text'],
+    ['distanceCentral','Distance to central / control location','text'],
+    ['fiber','Fiber available between sites','select',['Yes','No','Unknown']],
+    ['radioLos','Radio line-of-sight to central','select',['Clear','Obstructed','Unknown']],
+    ['protocols','Existing protocols in use','text'],
+    ['telemetry','Existing telemetry / polling arrangement','textarea'],
+  ]},
+  s07:{no:'07',title:'Environment & Physical',desc:'Physical conditions new equipment must survive.',fields:[
+    ['location','Location','select',['Indoor','Outdoor','Both']],
+    ['ambientTemp','Ambient temperature','text'],
+    ['humidity','Humidity / condensation','text'],
+    ['dust','Dust / corrosives present','text'],
+    ['hazArea','Hazardous-area classification — zone/class','text'],
+    ['cabinetSpace','Cabinet / mounting space for new gear','text'],
+    ['cableRouting','Cable routing / tray provisions','text'],
+    ['cooling','Panel cooling needed','select',['Yes','No']],
+  ]},
+};
+
+const SIGNAL_CARRIERS = ['Smart','Globe','DITO','Other'];
+
+const SAFETY_ITEMS = ['Hard hat','Safety shoes','Hi-vis vest','Insulated / rated gloves','Arc-flash PPE','Safety goggles','Ear protection'];
+
+const SUBSTATION_FIELDS = [
+  ['voltageClass','Voltage class','text'],
+  ['subType','Substation type','select',['Transmission','Sub-transmission','Distribution','Switching']],
+  ['latitude','Latitude','text'],
+  ['longitude','Longitude','text'],
+  ['busConfig','Bus configuration','select',['Single bus','Ring bus','Breaker-and-a-half','Double bus']],
+  ['numFeeders','Number of feeders / bays','number'],
+  ['relayBrand','Protection relay brand(s)','text'],
+  ['relayModel','Relay model(s)','text'],
+  ['relayComms','Relay comms port available','select',['Yes','No','Unknown']],
+  ['relayProtocol','Relay protocol','select',['DNP3','IEC 61850','Modbus','IEC 60870','Other']],
+  ['xfmrMonitoring','Transformer monitoring available','text'],
+  ['breakerPoints','Breaker status / control points','text'],
+  ['existingRtu','Existing RTU / substation automation system','text'],
+  ['linkToUtility','Existing link to utility control center','select',['Yes','No']],
+  ['ptAnalog','Estimated analog monitor points','number'],
+  ['ptDigital','Estimated digital monitor points','number'],
+  ['ptControl','Estimated control points','number'],
+  ['notes','Notes','textarea'],
+];
+
+const DIST_FIELDS = [
+  ['feederName','Feeder name / ID','text'],
+  ['nominalVoltage','Nominal voltage','text'],
+  ['circuitConfig','Circuit configuration','select',['Radial','Loop','Networked']],
+  ['conductor','Conductor type & size','text'],
+  ['construction','Line construction','select',['Overhead','Underground','Mixed']],
+  ['lineLength','Approx. line length surveyed','text'],
+  ['poleCondition','Pole / structure type & condition','text'],
+  ['rowCondition','Right-of-way condition','text'],
+  ['recloserLoc','Recloser / sectionalizer locations','text'],
+  ['capBankLoc','Capacitor bank locations & control','text'],
+  ['regulatorLoc','Voltage regulator locations','text'],
+  ['xfmrCount','Distribution transformer count','number'],
+  ['faultIndicators','Fault indicators present','select',['Yes','No']],
+  ['flisr','Existing feeder automation / FLISR','select',['Yes','No']],
+  ['amiPenetration','AMI / smart meter penetration','text'],
+  ['loadProfile','Load profile / peak demand','text'],
+  ['outageHistory','Outage history / known problem areas','textarea'],
+];
+
+const GEN_FIELDS = [
+  ['facilityType','Facility type','select',['Thermal','Hydro','Diesel-genset','Solar PV','Wind','Battery storage','Hybrid']],
+  ['capacity','Installed capacity (MW/kW)','text'],
+  ['numUnits','Number of generating units','number'],
+  ['primeMover','Prime mover type','select',['Steam turbine','Gas turbine','Diesel engine','Hydro turbine','PV inverter','Other']],
+  ['fuelType','Fuel type / source','text'],
+  ['genVoltage','Generator voltage (terminal)','text'],
+  ['stepUpXfmr','Step-up transformer rating & voltage','text'],
+  ['gridPoint','Grid interconnection point / voltage','text'],
+  ['excitation','Excitation system type','text'],
+  ['governor','Governor / speed control type','text'],
+  ['sync','Synchronizing equipment present','select',['Yes','No']],
+  ['avr','AVR present','select',['Yes','No']],
+  ['genRelay','Generator protection relay brand & model','text'],
+  ['blackstart','Black-start capability','select',['Yes','No']],
+  ['dispatch','Dispatch mode','select',['Base load','Peaking','Standby','Automatic transfer']],
+  ['fuelStorage','Fuel storage capacity & runtime at full load','text'],
+  ['emissions','Emissions monitoring / compliance equipment','select',['Yes','No']],
+  ['cooling','Cooling system type','select',['Air-cooled','Water-cooled','Cooling tower']],
+  ['plantScada','Existing plant DCS / SCADA','text'],
+  ['loadSharing','Load-sharing / paralleling controls','select',['Yes','No']],
+  ['ats','Auto-transfer switch (ATS) present','select',['Yes','No']],
+  ['totalUnits','Total generating units in system','number'],
+];
+
+let state = null;
+let currentKey = null;
+let saveTimer = null;
+let openSubIndex = {};
+
+const store = {
+  hasNative: (typeof window!=='undefined' && !!window.storage),
+  async get(key){
+    if(this.hasNative){ return window.storage.get(key, false); }
+    const raw = localStorage.getItem('ctk:'+key);
+    if(raw==null) throw new Error('not found');
+    return {key, value:raw};
+  },
+  async set(key, value){
+    if(this.hasNative){ return window.storage.set(key, value, false); }
+    localStorage.setItem('ctk:'+key, value);
+    return {key, value};
+  },
+};
+
+function blankState(client, siteName, siteType){
+  return {
+    meta:{docNo:'FSR-PGT-'+Date.now().toString().slice(-6), client:client||'', siteName:siteName||'', siteType:siteType||'', createdAt:new Date().toISOString(), rev:0},
+    core:{s01:{},s02:{},s03:{},s04:{},s07:{}},
+    signal:SIGNAL_CARRIERS.reduce((a,c)=>{a[c]={bars:'',dbm:'',tech:'',loc:''};return a;},{}),
+    signalRecommended:'',
+    instruments:[],
+    safety:{checked:{}, hazards:'', confinedSpace:'', arcFlash:''},
+    substationCount:0,
+    substations:[],
+    equipmentBySub:{},
+    distribution:{fields:{}, feeders:[]},
+    generation:{fields:{}, units:[]},
+    photos:[],
+    signoff:{surveyedBy:'', reviewedBy:'', clientRep:''},
+  };
+}
+
+function keyFor(docNo){ return 'survey:'+docNo; }
+
+async function saveState(silent){
+  if(!currentKey) return;
+  setStatus('saving');
+  try{
+    await store.set(currentKey, JSON.stringify(state));
+    let idx = [];
+    try{ const r = await store.get('survey-index'); idx = r? JSON.parse(r.value): []; }catch(e){ idx = []; }
+    idx = idx.filter(i=>i.key!==currentKey);
+    idx.unshift({key:currentKey, docNo:state.meta.docNo, client:state.meta.client, siteName:state.meta.siteName, siteType:state.meta.siteType, updatedAt:new Date().toISOString()});
+    idx = idx.slice(0,30);
+    await store.set('survey-index', JSON.stringify(idx));
+    setStatus('saved');
+  }catch(e){
+    setStatus('error');
+    console.error('save failed', e);
+  }
+}
+function queueSave(){
+  clearTimeout(saveTimer);
+  setStatus('editing');
+  saveTimer = setTimeout(()=>saveState(), 500);
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function setStatus(s){
+  const el = document.getElementById('saveStatus');
+  el.className = 'status ' + (s==='saved'?'saved':s==='saving'||s==='editing'?'saving':'');
+  el.textContent = s==='saved' ? 'saved' : s==='saving' ? 'saving…' : s==='editing' ? 'unsaved changes' : s==='error' ? 'save failed' : s;
+}
+
+async function loadRecent(){
+  const wrap = document.getElementById('recent');
+  const noneMsg = `<div style="margin-top:22px; text-align:center; font-size:12.5px; color:var(--ink3);">No recent surveys on this device/browser yet.<br>Once you save a survey it'll show up here — or use "Import saved file" above.</div>`;
+  try{
+    const r = await store.get('survey-index');
+    const idx = r? JSON.parse(r.value): [];
+    if(!idx.length){ wrap.innerHTML=noneMsg; return; }
+    wrap.innerHTML = '<div style="font-size:11px;color:var(--ink3);margin:22px 0 8px;">RECENT SURVEYS ON THIS DEVICE</div>' +
+      idx.map(i=>`<div class="item" data-key="${i.key}"><div><div class="id">${i.docNo}${i.siteType? ' · '+i.siteType : ''}</div><div class="nm">${escapeHtml(i.siteName||'Untitled')} — ${escapeHtml(i.client||'')}</div></div><span style="color:var(--ink3);font-size:11px;">open →</span></div>`).join('');
+    wrap.querySelectorAll('.item').forEach(el=>{
+      el.addEventListener('click', async ()=>{
+        const rec = await store.get(el.dataset.key);
+        if(rec){ state = JSON.parse(rec.value); currentKey = el.dataset.key; boot(); }
+      });
+    });
+  }catch(e){ wrap.innerHTML=noneMsg; }
+}
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------------------------------------------------------------
+   BOOT / GATE
+--------------------------------------------------------------- */
+document.getElementById('gateImportBtn').addEventListener('click', ()=>{
+  document.getElementById('gateImportFile').click();
+});
+document.getElementById('gateImportFile').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const isPdf = file.type==='application/pdf' || /\.pdf$/i.test(file.name);
+  try{
+    if(isPdf){
+      const partial = await importFromPdf(file);
+      state = blankState(partial['meta.client']||'', partial['meta.siteName']||'', partial['meta.siteType']||'');
+      applyPdfValues(state, partial);
+      currentKey = keyFor(state.meta.docNo);
+      openSubIndex = {};
+      boot();
+      await saveState();
+      alert('Imported from PDF. This is best-effort text matching, not exact data recovery — please review every tab carefully, especially the Substations, Instrumentation, and Photo tables, which are not restored from a PDF and need to be re-entered. For an exact, full-fidelity restore, use a .json file saved with "Save file (.json)" instead.');
+      showToast('Survey imported from PDF — please review');
+    } else {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if(!parsed || !parsed.meta || !parsed.core){ throw new Error('not a survey file'); }
+      state = parsed;
+      currentKey = keyFor(state.meta.docNo);
+      openSubIndex = {};
+      boot();
+      await saveState();
+      showToast('Survey imported');
+    }
+  }catch(err){
+    console.error(err);
+    alert('Could not read that file — make sure it\'s a .json file, or a .pdf that was saved from this checklist\'s "Print / PDF" button.');
+  }
+  e.target.value = '';
+});
+
+/* ---- Best-effort PDF import: extract text, match against known field labels ---- */
+function buildLabelMap(){
+  const map = [];
+  map.push(['Document number','meta.docNo']);
+  map.push(['Client / utility / IPP','meta.client']);
+  map.push(['Site / station name','meta.siteName']);
+  map.push(['Revision','meta.rev']);
+  map.push(['Power utility type','meta.siteType']);
+  Object.keys(CORE_FIELDS).forEach(secKey=>{
+    CORE_FIELDS[secKey].fields.forEach(f=>map.push([f[1], 'core.'+secKey+'.'+f[0]]));
+  });
+  map.push(['Recommended provider for this site','signalRecommended']);
+  map.push(['Site hazards (narrative)','safety.hazards']);
+  map.push(['Confined-space entry involved','safety.confinedSpace']);
+  map.push(['Arc-flash risk / boundary posted','safety.arcFlash']);
+  DIST_FIELDS.forEach(f=>map.push([f[1], 'distribution.fields.'+f[0]]));
+  GEN_FIELDS.forEach(f=>map.push([f[1], 'generation.fields.'+f[0]]));
+  map.push(['Surveyed by','signoff.surveyedBy']);
+  map.push(['Reviewed by','signoff.reviewedBy']);
+  map.push(['Client representative','signoff.clientRep']);
+  return map;
+}
+async function extractPdfLines(file){
+  if(typeof pdfjsLib==='undefined'){ throw new Error('PDF reader failed to load — check your internet connection and try again.'); }
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data:buf}).promise;
+  const lines = [];
+  for(let p=1;p<=pdf.numPages;p++){
+    const page = await pdf.getPage(p);
+    const content = await page.getTextContent();
+    let lastY=null, cur=[];
+    content.items.forEach(item=>{
+      const y = Math.round(item.transform[5]);
+      if(lastY===null || Math.abs(y-lastY)>2){
+        if(cur.length) lines.push(cur.join(' ').replace(/\s+/g,' ').trim());
+        cur=[item.str]; lastY=y;
+      } else { cur.push(item.str); }
+    });
+    if(cur.length) lines.push(cur.join(' ').replace(/\s+/g,' ').trim());
+  }
+  return lines.filter(l=>l.length);
+}
+async function importFromPdf(file){
+  const lines = await extractPdfLines(file);
+  const labelMap = buildLabelMap().sort((a,b)=>b[0].length-a[0].length);
+  const result = {};
+  for(let i=0;i<lines.length;i++){
+    const line = lines[i];
+    const match = labelMap.find(m=>line.toLowerCase()===m[0].toLowerCase());
+    if(match && i+1<lines.length){
+      const val = lines[i+1];
+      const valIsLabel = labelMap.some(m2=>val.toLowerCase()===m2[0].toLowerCase());
+      if(val && !valIsLabel && val!=='—'){ result[match[1]] = val; }
+    }
+  }
+  return result;
+}
+function applyPdfValues(target, values){
+  Object.keys(values).forEach(path=>{
+    const parts = path.split('.');
+    let cur = target;
+    for(let i=0;i<parts.length-1;i++){
+      if(cur[parts[i]]===undefined) return;
+      cur = cur[parts[i]];
+    }
+    cur[parts[parts.length-1]] = values[path];
+  });
+}
+document.getElementById('gateStart').addEventListener('click', ()=>{
+  const client = document.getElementById('gateClient').value.trim();
+  const siteName = document.getElementById('gateSite').value.trim();
+  const siteType = document.getElementById('gateType').value;
+  if(!siteType){
+    alert('Select a power utility type (Generation, Transmission, or Distribution) to continue — it determines which survey sections you\'ll see.');
+    return;
+  }
+  state = blankState(client, siteName, siteType);
+  state.core.s01.client = client;
+  state.core.s01.siteName = siteName;
+  currentKey = keyFor(state.meta.docNo);
+  boot();
+  saveState();
+});
+function resetGateInputs(){
+  document.getElementById('gateClient').value='';
+  document.getElementById('gateSite').value='';
+  document.getElementById('gateType').value='';
+}
+function doGoHome(){
+  const ok = confirm('Are you sure you want to go to the Home page?\n\nBe sure you\'ve saved this survey first — unsaved changes will stay only in this browser until you hit "Save survey" or "Save file".');
+  if(!ok) return;
+  document.getElementById('app').style.display='none';
+  document.getElementById('gate').style.display='block';
+  document.body.classList.remove('app-open');
+  resetGateInputs();
+  loadRecent();
+  closeMoreSheet();
+}
+async function doSaveSurvey(){
+  const ok = confirm('Are you sure you want to save this Site Survey result?');
+  if(!ok) return;
+  await saveState();
+  showToast('Survey saved');
+  closeMoreSheet();
+  setTimeout(()=>{
+    document.getElementById('app').style.display='none';
+    document.getElementById('gate').style.display='block';
+    document.body.classList.remove('app-open');
+    resetGateInputs();
+    loadRecent();
+  }, 500);
+}
+function doPrint(){ closeMoreSheet(); window.print(); }
+function doClearForm(){
+  const ok = confirm('Are you sure you want to clear all entries in this Site Survey Checklist?\n\nThis cannot be undone. This only clears what\'s on screen — it stays on this checklist rather than returning to Home.');
+  if(!ok) return;
+  clearTimeout(saveTimer);
+  const keepType = state.meta.siteType;
+  const keepDocNo = state.meta.docNo;
+  state = blankState('', '', keepType);
+  state.meta.docNo = keepDocNo;
+  openSubIndex = {};
+  boot();
+  queueSave();
+  closeMoreSheet();
+  showToast('Checklist cleared');
+}
+function doExportFile(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (state.meta.docNo||'survey')+'.json';
+  a.click();
+  closeMoreSheet();
+}
+function openMoreSheet(){
+  document.getElementById('mobileMoreSheet').classList.add('open');
+  document.getElementById('sheetBackdrop').classList.add('open');
+}
+function closeMoreSheet(){
+  const s = document.getElementById('mobileMoreSheet');
+  const b = document.getElementById('sheetBackdrop');
+  if(s) s.classList.remove('open');
+  if(b) b.classList.remove('open');
+}
+
+document.getElementById('btnHome').addEventListener('click', doGoHome);
+document.getElementById('btnSave').addEventListener('click', doSaveSurvey);
+document.getElementById('btnPrint').addEventListener('click', doPrint);
+document.getElementById('btnClear').addEventListener('click', doClearForm);
+document.getElementById('btnExport').addEventListener('click', doExportFile);
+
+document.getElementById('mSave').addEventListener('click', doSaveSurvey);
+document.getElementById('mHome').addEventListener('click', doGoHome);
+document.getElementById('mMore').addEventListener('click', openMoreSheet);
+document.getElementById('mExport').addEventListener('click', doExportFile);
+document.getElementById('mPrint').addEventListener('click', doPrint);
+document.getElementById('mClear').addEventListener('click', doClearForm);
+document.getElementById('mCloseSheet').addEventListener('click', closeMoreSheet);
+document.getElementById('sheetBackdrop').addEventListener('click', closeMoreSheet);
+
+loadRecent();
+
+/* ---------------------------------------------------------------
+   RENDER
+--------------------------------------------------------------- */
+const TABS = [
+  {id:'overview', no:'—', label:'Overview'},
+  {id:'core', no:'01', label:'Core survey'},
+  {id:'substations', no:'02', label:'Substations', types:['Transmission','Distribution']},
+  {id:'distribution', no:'03', label:'Distribution', types:['Distribution']},
+  {id:'generation', no:'04', label:'Generation', types:['Generation']},
+  {id:'signal', no:'05', label:'Cellular signal'},
+  {id:'instruments', no:'06', label:'Instrumentation'},
+  {id:'env', no:'07', label:'Environment'},
+  {id:'safety', no:'08', label:'Safety'},
+  {id:'closeout', no:'09', label:'Photos & sign-off'},
+];
+function visibleTabs(){
+  return TABS.filter(t=> !t.types || t.types.includes(state.meta.siteType));
+}
+
+function boot(){
+  document.getElementById('gate').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.body.classList.add('app-open');
+  document.getElementById('docno').textContent = state.meta.docNo + (state.meta.siteName? ' · '+state.meta.siteName : '') + (state.meta.siteType? ' · '+state.meta.siteType : '');
+  document.getElementById('footRev').textContent = 'rev '+ (state.meta.rev||0);
+
+  renderTabs();
+  const panels = document.getElementById('panels');
+  panels.innerHTML = TABS.map(t=>`<div class="panel" id="panel-${t.id}"></div>`).join('');
+  document.getElementById('panel-overview').classList.add('active');
+
+  renderOverview();
+  renderCore();
+  renderSignal();
+  renderInstruments();
+  renderEnv();
+  renderSafety();
+  renderSubstations();
+  renderDistribution();
+  renderGeneration();
+  renderCloseout();
+}
+
+function renderTabs(){
+  const tabsEl = document.getElementById('tabs');
+  const vis = visibleTabs();
+  const activeId = tabsEl.querySelector('button.active')?.dataset.tab;
+  const keepActive = vis.some(t=>t.id===activeId) ? activeId : 'overview';
+  tabsEl.innerHTML = vis.map(t=>`<button data-tab="${t.id}" class="${t.id===keepActive?'active':''}"><span class="n">${t.no}</span>${t.label}</button>`).join('');
+  tabsEl.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>showTab(b.dataset.tab)));
+  showTab(keepActive);
+}
+function showTab(id){
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+id));
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+function fieldHtml(id, label, type, options, value){
+  value = value==null? '' : value;
+  if(type==='select'){
+    return `<div class="field"><label>${label}</label><select data-bind="${id}"><option value="">—</option>${options.map(o=>`<option value="${o}" ${o===value?'selected':''}>${o}</option>`).join('')}</select></div>`;
+  }
+  if(type==='textarea'){
+    return `<div class="field" style="grid-column:1/-1;"><label>${label}</label><textarea data-bind="${id}">${escapeHtml(value)}</textarea></div>`;
+  }
+  return `<div class="field"><label>${label}</label><input type="${type}" data-bind="${id}" value="${escapeHtml(value)}"></div>`;
+}
+
+function bindSection(container, getObj, setDirty){
+  container.querySelectorAll('[data-bind]').forEach(el=>{
+    el.addEventListener('input', ()=>{
+      getObj()[el.dataset.bind] = el.value;
+      queueSave();
+    });
+  });
+}
+
+/* --- Overview --- */
+function renderOverview(){
+  const el = document.getElementById('panel-overview');
+  const total = countAll();
+  el.innerHTML = `
+    <div class="card">
+      <h2><span class="tag">META</span> Site &amp; document info</h2>
+      <div class="grid2" id="metaGrid"></div>
+    </div>
+    <div class="card">
+      <h2>Survey completion</h2>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" style="width:${total.pct}%"></div></div>
+        <div class="progress-label"><span>${total.filled} of ${total.max} fields captured</span><span>${total.pct}%</span></div>
+      </div>
+      <div class="sectionlist" id="sectionNav"></div>
+    </div>`;
+  const metaGrid = el.querySelector('#metaGrid');
+  metaGrid.innerHTML = [
+    fieldHtml('docNo','Document number','text',null,state.meta.docNo),
+    fieldHtml('client','Client / utility / IPP','text',null,state.meta.client),
+    fieldHtml('siteName','Site / station name','text',null,state.meta.siteName),
+    fieldHtml('rev','Revision','text',null,state.meta.rev),
+    fieldHtml('siteType','Power utility type','select',['Generation','Transmission','Distribution'],state.meta.siteType),
+  ].join('');
+  metaGrid.querySelectorAll('[data-bind]').forEach(elm=>{
+    elm.addEventListener('input', ()=>{
+      state.meta[elm.dataset.bind] = elm.value;
+      document.getElementById('docno').textContent = state.meta.docNo + (state.meta.siteName? ' · '+state.meta.siteName : '') + (state.meta.siteType? ' · '+state.meta.siteType : '');
+      document.getElementById('footRev').textContent = 'rev '+ (state.meta.rev||0);
+      if(elm.dataset.bind==='siteType'){ renderTabs(); renderOverview(); }
+      queueSave();
+    });
+  });
+  const nav = el.querySelector('#sectionNav');
+  nav.innerHTML = visibleTabs().slice(1).map(t=>`<a href="#" data-go="${t.id}"><span class="num">${t.no}</span>${t.label}</a>`).join('');
+  nav.querySelectorAll('a').forEach(a=>a.addEventListener('click', e=>{e.preventDefault(); showTab(a.dataset.go);}));
+}
+
+function countAll(){
+  let filled=0, max=0;
+  Object.values(CORE_FIELDS).forEach(sec=>sec.fields.forEach(f=>{ max++; if(state.core[Object.keys(CORE_FIELDS).find(k=>CORE_FIELDS[k]===sec)][f[0]]) filled++; }));
+  if(state.substationCount>0){
+    state.substations.forEach(s=>{ SUBSTATION_FIELDS.forEach(f=>{ max++; if(s.data[f[0]]) filled++; }); });
+  }
+  DIST_FIELDS.forEach(f=>{ max++; if(state.distribution.fields[f[0]]) filled++; });
+  GEN_FIELDS.forEach(f=>{ max++; if(state.generation.fields[f[0]]) filled++; });
+  const pct = max? Math.round(filled/max*100) : 0;
+  return {filled, max, pct};
+}
+
+/* --- Core sections 01-04 --- */
+function renderCore(){
+  const el = document.getElementById('panel-core');
+  el.innerHTML = ['s01','s02','s03','s04'].map(key=>{
+    const sec = CORE_FIELDS[key];
+    return `<div class="card" data-sec="${key}">
+      <h2><span class="tag">${sec.no}</span> ${sec.title}</h2>
+      <p class="desc">${sec.desc}</p>
+      <div class="grid2">${sec.fields.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.core[key][f[0]])).join('')}</div>
+    </div>`;
+  }).join('');
+  ['s01','s02','s03','s04'].forEach(key=>{
+    bindSection(el.querySelector(`[data-sec="${key}"]`), ()=>state.core[key]);
+  });
+}
+
+/* --- Signal --- */
+function renderSignal(){
+  const el = document.getElementById('panel-signal');
+  el.innerHTML = `<div class="card">
+    <h2><span class="tag">05</span> Cellular Signal Survey</h2>
+    <p class="desc">Take a reading near the proposed panel/enclosure location for each available carrier.</p>
+    <table class="dyn"><thead><tr><th>Provider</th><th>Technology</th><th>Bars (0–5)</th><th>dBm</th><th>Measurement location</th></tr></thead>
+    <tbody>${SIGNAL_CARRIERS.map(c=>`<tr data-carrier="${c}">
+      <td style="font-weight:600;">${c}</td>
+      <td><input data-f="tech" value="${escapeHtml(state.signal[c].tech)}" placeholder="4G/LTE"></td>
+      <td><input data-f="bars" value="${escapeHtml(state.signal[c].bars)}" placeholder="0-5"></td>
+      <td><input data-f="dbm" value="${escapeHtml(state.signal[c].dbm)}" placeholder="-95"></td>
+      <td><input data-f="loc" value="${escapeHtml(state.signal[c].loc)}" placeholder="Proposed panel location"></td>
+    </tr>`).join('')}</tbody></table>
+    <div class="field" style="margin-top:16px;"><label>Recommended provider for this site</label>
+    <input id="signalRec" value="${escapeHtml(state.signalRecommended)}"></div>
+  </div>`;
+  el.querySelectorAll('tr[data-carrier] input').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const c = inp.closest('tr').dataset.carrier;
+      state.signal[c][inp.dataset.f] = inp.value;
+      queueSave();
+    });
+  });
+  el.querySelector('#signalRec').addEventListener('input', e=>{ state.signalRecommended = e.target.value; queueSave(); });
+}
+
+/* --- Instruments --- */
+function renderInstruments(){
+  const el = document.getElementById('panel-instruments');
+  el.innerHTML = `<div class="card">
+    <h2><span class="tag">06</span> Instrumentation &amp; Field Signals</h2>
+    <p class="desc">Itemize instruments and devices found on site.</p>
+    <table class="dyn"><thead><tr><th>Tag</th><th>Measurement</th><th>Signal</th><th>Brand / Model</th><th>Notes</th><th></th></tr></thead>
+    <tbody id="instrRows"></tbody></table>
+    <button class="btn small addrow" id="addInstr">+ Add instrument</button>
+  </div>`;
+  renderInstrRows();
+  el.querySelector('#addInstr').addEventListener('click', ()=>{
+    state.instruments.push({tag:'',measurement:'',signal:'',brand:'',notes:''});
+    renderInstrRows(); queueSave();
+  });
+}
+function renderInstrRows(){
+  const tbody = document.getElementById('instrRows');
+  tbody.innerHTML = state.instruments.map((row,i)=>`<tr data-i="${i}">
+    ${['tag','measurement','signal','brand','notes'].map(f=>`<td><input data-f="${f}" value="${escapeHtml(row[f])}"></td>`).join('')}
+    <td><button class="rm" data-rm="${i}">×</button></td></tr>`).join('') ||
+    `<tr><td colspan="6" style="color:var(--ink3);font-size:12px;padding:10px 0;">No instruments added yet.</td></tr>`;
+  tbody.querySelectorAll('input').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const i = inp.closest('tr').dataset.i;
+      state.instruments[i][inp.dataset.f] = inp.value;
+      queueSave();
+    });
+  });
+  tbody.querySelectorAll('[data-rm]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ state.instruments.splice(btn.dataset.rm,1); renderInstrRows(); queueSave(); });
+  });
+}
+
+/* --- Environment --- */
+function renderEnv(){
+  const el = document.getElementById('panel-env');
+  const sec = CORE_FIELDS.s07;
+  el.innerHTML = `<div class="card" data-sec="s07">
+    <h2><span class="tag">07</span> ${sec.title}</h2>
+    <p class="desc">${sec.desc}</p>
+    <div class="grid2">${sec.fields.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.core.s07[f[0]])).join('')}</div>
+  </div>`;
+  bindSection(el.querySelector('[data-sec="s07"]'), ()=>state.core.s07);
+}
+
+/* --- Safety --- */
+function renderSafety(){
+  const el = document.getElementById('panel-safety');
+  el.innerHTML = `<div class="card">
+    <h2><span class="tag">08</span> Safety</h2>
+    <p class="desc">PPE required and hazards observed on site.</p>
+    <div>${SAFETY_ITEMS.map(item=>`<label class="checkrow"><input type="checkbox" data-ppe="${item}" ${state.safety.checked[item]?'checked':''}><span class="lbl">${item}</span></label>`).join('')}</div>
+    <div class="grid2" style="margin-top:16px;">
+      <div class="field" style="grid-column:1/-1;"><label>Site hazards (narrative)</label><textarea id="hazards">${escapeHtml(state.safety.hazards)}</textarea></div>
+      <div class="field"><label>Confined-space entry involved</label><select id="confined"><option value="">—</option><option ${state.safety.confinedSpace==='Yes'?'selected':''}>Yes</option><option ${state.safety.confinedSpace==='No'?'selected':''}>No</option></select></div>
+      <div class="field"><label>Arc-flash risk / boundary posted</label><select id="arcflash"><option value="">—</option><option ${state.safety.arcFlash==='Yes'?'selected':''}>Yes</option><option ${state.safety.arcFlash==='No'?'selected':''}>No</option></select></div>
+    </div>
+  </div>`;
+  el.querySelectorAll('[data-ppe]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{ state.safety.checked[cb.dataset.ppe] = cb.checked; queueSave(); });
+  });
+  el.querySelector('#hazards').addEventListener('input', e=>{ state.safety.hazards = e.target.value; queueSave(); });
+  el.querySelector('#confined').addEventListener('change', e=>{ state.safety.confinedSpace = e.target.value; queueSave(); });
+  el.querySelector('#arcflash').addEventListener('change', e=>{ state.safety.arcFlash = e.target.value; queueSave(); });
+}
+
+/* --- Substations (dynamic count) --- */
+function renderSubstations(){
+  const el = document.getElementById('panel-substations');
+  el.innerHTML = `<div class="card">
+    <h2><span class="tag">09</span> Substation / Transmission &amp; Distribution Details</h2>
+    <p class="desc">Set how many substations this client/site has, then complete one block per substation. On a phone or tablet, use "Scan current location" inside each substation to auto-fill its GPS coordinates from the device's GPS — it'll ask for location permission the first time, and needs the page opened over a secure (https) connection to work.</p>
+    <div class="countbar">
+      <div class="lbl2">Number of substations for this client</div>
+      <input type="number" min="0" max="50" id="subCount" value="${state.substationCount}">
+      <div class="hint2">Changing this adds or removes substation blocks below. Each block captures its own equipment inventory.</div>
+    </div>
+    <div class="subwrap" id="subWrap"></div>
+  </div>`;
+  el.querySelector('#subCount').addEventListener('change', e=>{
+    let n = parseInt(e.target.value||'0',10);
+    if(isNaN(n)||n<0) n=0;
+    if(n>50) n=50;
+    e.target.value = n;
+    resizeSubstations(n);
+  });
+  renderSubList();
+}
+function resizeSubstations(n){
+  const cur = state.substations.length;
+  if(n>cur){
+    for(let i=cur;i<n;i++){
+      state.substations.push({name:'Substation '+(i+1), data:{}});
+      state.equipmentBySub[i] = [];
+    }
+  } else if(n<cur){
+    state.substations = state.substations.slice(0,n);
+  }
+  state.substationCount = n;
+  renderSubList();
+  queueSave();
+}
+function renderSubList(){
+  const wrap = document.getElementById('subWrap');
+  if(!wrap) return;
+  if(!state.substations.length){
+    wrap.innerHTML = `<div style="color:var(--ink3);font-size:12.5px;padding:8px 2px;">No substations added yet — set the count above.</div>`;
+    return;
+  }
+  wrap.innerHTML = state.substations.map((s,i)=>`
+    <div class="substation ${openSubIndex[i]?'open':''}" data-idx="${i}">
+      <div class="shead">
+        <span class="idx">SS-${String(i+1).padStart(2,'0')}</span>
+        <span class="nm"><input data-namefor="${i}" value="${escapeHtml(s.name)}" placeholder="Substation name"></span>
+        <span class="meta">${s.data.voltageClass||'—'} · ${s.data.subType||'type n/a'}</span>
+        <span class="chev">▶</span>
+      </div>
+      <div class="sbody">
+        <div class="grid2">${SUBSTATION_FIELDS.map(f=>fieldHtml('f-'+f[0],f[1],f[2],f[3],s.data[f[0]])).join('')}</div>
+        <div style="margin:-8px 0 16px;">
+          <button class="btn small" data-gps="${i}" type="button">📍 Scan current location</button>
+          <span id="gpsHint-${i}" style="display:inline-block;margin-left:10px;font-size:11.5px;color:var(--ink3);"></span>
+        </div>
+        <div style="margin-top:6px;">
+          <label style="margin-bottom:8px;">Major equipment inventory</label>
+          <table class="dyn"><thead><tr><th>Tag / Name</th><th>Type</th><th>Rating</th><th>Comms / Protocol</th><th>Notes</th><th></th></tr></thead>
+          <tbody data-eqbody="${i}"></tbody></table>
+          <button class="btn small addrow" data-addeq="${i}">+ Add equipment</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  wrap.querySelectorAll('.shead').forEach(h=>{
+    h.addEventListener('click', (e)=>{
+      if(e.target.tagName==='INPUT') return;
+      const card = h.closest('.substation');
+      const idx = card.dataset.idx;
+      openSubIndex[idx] = !openSubIndex[idx];
+      card.classList.toggle('open', openSubIndex[idx]);
+    });
+  });
+  wrap.querySelectorAll('[data-namefor]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      state.substations[inp.dataset.namefor].name = inp.value;
+      inp.closest('.substation').querySelector('.nm input').value = inp.value;
+      queueSave();
+    });
+    inp.addEventListener('click', e=>e.stopPropagation());
+  });
+  wrap.querySelectorAll('.sbody [data-bind]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const idx = inp.closest('.substation').dataset.idx;
+      const key = inp.dataset.bind.replace('f-','');
+      state.substations[idx].data[key] = inp.value;
+      if(key==='voltageClass'||key==='subType'){
+        inp.closest('.substation').querySelector('.meta').textContent =
+          (state.substations[idx].data.voltageClass||'—')+' · '+(state.substations[idx].data.subType||'type n/a');
+      }
+      queueSave();
+    });
+  });
+  state.substations.forEach((s,i)=>renderEqRows(i));
+  wrap.querySelectorAll('[data-addeq]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = btn.dataset.addeq;
+      if(!state.equipmentBySub[i]) state.equipmentBySub[i]=[];
+      state.equipmentBySub[i].push({tag:'',type:'',rating:'',comms:'',notes:''});
+      renderEqRows(i); queueSave();
+    });
+  });
+  wrap.querySelectorAll('[data-gps]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); captureGps(btn.dataset.gps); });
+  });
+}
+function captureGps(i){
+  const hint = document.getElementById('gpsHint-'+i);
+  if(!navigator.geolocation){
+    if(hint) hint.textContent = 'Location not supported on this browser.';
+    return;
+  }
+  if(hint) hint.textContent = 'Scanning…';
+  navigator.geolocation.getCurrentPosition(
+    (pos)=>{
+      const lat = pos.coords.latitude.toFixed(6);
+      const lon = pos.coords.longitude.toFixed(6);
+      const acc = Math.round(pos.coords.accuracy);
+      state.substations[i].data.latitude = lat;
+      state.substations[i].data.longitude = lon;
+      const latInp = document.querySelector('.substation[data-idx="'+i+'"] [data-bind="f-latitude"]');
+      const lonInp = document.querySelector('.substation[data-idx="'+i+'"] [data-bind="f-longitude"]');
+      if(latInp) latInp.value = lat;
+      if(lonInp) lonInp.value = lon;
+      if(hint) hint.textContent = 'Captured — accuracy ±' + acc + ' m';
+      queueSave();
+    },
+    (err)=>{
+      let msg = 'Could not get location (' + err.message + ').';
+      if(err.code===1) msg = 'Location permission denied — allow location access for this site in your browser/device settings.';
+      if(hint) hint.textContent = msg;
+    },
+    {enableHighAccuracy:true, timeout:15000, maximumAge:0}
+  );
+}
+function renderEqRows(i){
+  const tbody = document.querySelector(`[data-eqbody="${i}"]`);
+  if(!tbody) return;
+  const rows = state.equipmentBySub[i]||[];
+  tbody.innerHTML = rows.map((row,j)=>`<tr data-j="${j}">
+    ${['tag','type','rating','comms','notes'].map(f=>`<td><input data-f="${f}" value="${escapeHtml(row[f])}"></td>`).join('')}
+    <td><button class="rm" data-rm="${j}">×</button></td></tr>`).join('') ||
+    `<tr><td colspan="6" style="color:var(--ink3);font-size:12px;padding:8px 0;">No equipment added yet.</td></tr>`;
+  tbody.querySelectorAll('input').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const j = inp.closest('tr').dataset.j;
+      state.equipmentBySub[i][j][inp.dataset.f] = inp.value;
+      queueSave();
+    });
+  });
+  tbody.querySelectorAll('[data-rm]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ state.equipmentBySub[i].splice(btn.dataset.rm,1); renderEqRows(i); queueSave(); });
+  });
+}
+
+/* --- Distribution --- */
+function renderDistribution(){
+  const el = document.getElementById('panel-distribution');
+  el.innerHTML = `<div class="card">
+    <h2><span class="tag">10</span> Distribution Feeder &amp; Line Survey</h2>
+    <p class="desc">Complete for overhead/underground distribution line and feeder-level surveys.</p>
+    <div class="grid2">${DIST_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.distribution.fields[f[0]])).join('')}</div>
+  </div>`;
+  bindSection(el, ()=>state.distribution.fields);
+}
+
+/* --- Generation --- */
+function renderGeneration(){
+  const el = document.getElementById('panel-generation');
+  el.innerHTML = `<div class="card">
+    <h2><span class="tag">11</span> Power Generation Details</h2>
+    <p class="desc">Complete for generating stations — utility-scale plants or standby/backup generators.</p>
+    <div class="grid2">${GEN_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],state.generation.fields[f[0]])).join('')}</div>
+    <div style="margin-top:6px;">
+      <label style="margin-bottom:8px;">Generator / unit inventory</label>
+      <table class="dyn"><thead><tr><th>Unit tag</th><th>Rating</th><th>Prime mover</th><th>Fuel</th><th>Status</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="genRows"></tbody></table>
+      <button class="btn small addrow" id="addUnit">+ Add unit</button>
+    </div>
+  </div>`;
+  bindSection(el, ()=>state.generation.fields);
+  renderGenRows();
+  el.querySelector('#addUnit').addEventListener('click', ()=>{
+    state.generation.units.push({tag:'',rating:'',mover:'',fuel:'',status:'',notes:''});
+    renderGenRows(); queueSave();
+  });
+}
+function renderGenRows(){
+  const tbody = document.getElementById('genRows');
+  tbody.innerHTML = state.generation.units.map((row,i)=>`<tr data-i="${i}">
+    ${['tag','rating','mover','fuel','status','notes'].map(f=>`<td><input data-f="${f}" value="${escapeHtml(row[f])}"></td>`).join('')}
+    <td><button class="rm" data-rm="${i}">×</button></td></tr>`).join('') ||
+    `<tr><td colspan="7" style="color:var(--ink3);font-size:12px;padding:8px 0;">No units added yet.</td></tr>`;
+  tbody.querySelectorAll('input').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const i = inp.closest('tr').dataset.i;
+      state.generation.units[i][inp.dataset.f] = inp.value;
+      queueSave();
+    });
+  });
+  tbody.querySelectorAll('[data-rm]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ state.generation.units.splice(btn.dataset.rm,1); renderGenRows(); queueSave(); });
+  });
+}
+
+/* --- Photos & sign-off --- */
+function renderCloseout(){
+  const el = document.getElementById('panel-closeout');
+  el.innerHTML = `<div class="card">
+    <h2><span class="tag">A</span> Photo appendix</h2>
+    <p class="desc">Reference each photo you took (stored elsewhere) to a section and caption.</p>
+    <table class="dyn"><thead><tr><th>Section</th><th>Caption</th><th>Notes</th><th></th></tr></thead>
+    <tbody id="photoRows"></tbody></table>
+    <button class="btn small addrow" id="addPhoto">+ Add photo reference</button>
+  </div>
+  <div class="card">
+    <h2><span class="tag">B</span> Sign-off</h2>
+    <div class="grid3">
+      ${fieldHtml('surveyedBy','Surveyed by','text',null,state.signoff.surveyedBy)}
+      ${fieldHtml('reviewedBy','Reviewed by','text',null,state.signoff.reviewedBy)}
+      ${fieldHtml('clientRep','Client representative','text',null,state.signoff.clientRep)}
+    </div>
+  </div>`;
+  el.querySelectorAll('.card:last-child [data-bind]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{ state.signoff[inp.dataset.bind] = inp.value; queueSave(); });
+  });
+  renderPhotoRows();
+  el.querySelector('#addPhoto').addEventListener('click', ()=>{
+    state.photos.push({section:'',caption:'',notes:''});
+    renderPhotoRows(); queueSave();
+  });
+}
+function renderPhotoRows(){
+  const tbody = document.getElementById('photoRows');
+  tbody.innerHTML = state.photos.map((row,i)=>`<tr data-i="${i}">
+    ${['section','caption','notes'].map(f=>`<td><input data-f="${f}" value="${escapeHtml(row[f])}"></td>`).join('')}
+    <td><button class="rm" data-rm="${i}">×</button></td></tr>`).join('') ||
+    `<tr><td colspan="4" style="color:var(--ink3);font-size:12px;padding:8px 0;">No photo references yet.</td></tr>`;
+  tbody.querySelectorAll('input').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const i = inp.closest('tr').dataset.i;
+      state.photos[i][inp.dataset.f] = inp.value;
+      queueSave();
+    });
+  });
+  tbody.querySelectorAll('[data-rm]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ state.photos.splice(btn.dataset.rm,1); renderPhotoRows(); queueSave(); });
+  });
+}
+</script>
+</body>
+</html>
