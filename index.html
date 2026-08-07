@@ -499,7 +499,7 @@ const store = {
 
 function blankState(client, siteName, siteType){
   return {
-    meta:{docNo:'FSR-PGT-'+Date.now().toString().slice(-6), client:client||'', siteName:siteName||'', siteType:siteType||'', createdAt:new Date().toISOString(), rev:0},
+    meta:{docNo:'CSI-SSA-'+Date.now().toString().slice(-6), client:client||'', siteName:siteName||'', siteType:siteType||'', createdAt:new Date().toISOString(), rev:0},
     core:{s01:{},s02:{},s03:{},s04:{},s07:{}},
     signal:SIGNAL_CARRIERS.reduce((a,c)=>{a[c]={bars:'',dbm:'',tech:'',loc:''};return a;},{}),
     signalRecommended:'',
