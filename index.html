@@ -165,6 +165,14 @@
   .substation .shead .chev{color:var(--ink3); font-size:12px; transition:transform .15s;}
   .substation.open .chev{transform:rotate(90deg); color:var(--accent);}
   .substation .sbody{display:none; padding:18px 18px 6px; border-top:1.5px solid var(--line);}
+  .subtabs{display:flex; gap:2px; margin-bottom:16px; flex-wrap:wrap; border-bottom:1px solid var(--line-soft); padding-bottom:0;}
+  .subtabs button{
+    background:none; border:none; color:var(--ink3); padding:7px 11px; font-size:10.5px; font-weight:600;
+    font-family:var(--mono); text-transform:uppercase; letter-spacing:.04em; border-bottom:2px solid transparent;
+  }
+  .subtabs button.active{color:var(--accent); border-bottom-color:var(--accent);}
+  .subtabs button:hover:not(.active){color:var(--ink);}
+  .subpanel{padding-top:2px;}
   .substation.open .sbody{display:block;}
 
   .countbar{
@@ -472,10 +480,51 @@ const GEN_FIELDS = [
   ['totalUnits','Total generating units in system','number'],
 ];
 
+/* ---- Master Station (SCADA / control room) ---- */
+const MASTER_OVERVIEW_FIELDS = [
+  ['scadaSoftware','Existing SCADA software (brand/version)','text'],
+  ['archDiagram','Is a system architecture diagram available?','select',['Yes','No']],
+  ['totalInverters','Total number of inverters (if applicable)','text'],
+  ['inverterType','Type of inverters (if applicable)','select',['Central','String','Mixed','N/A']],
+  ['plannedInverterBrand','Planned string inverter brand/model (if applicable)','text'],
+  ['ngcpPoints','Are NGCP control points present?','select',['Yes','No']],
+  ['replicateFeatures','Do all existing SCADA vendor features need to be replicated?','select',['Yes','No']],
+  ['openProtocol','Is the new SCADA expected to be open protocol / non-proprietary?','select',['Yes','No']],
+  ['cloudReady','Must the new SCADA be cloud-ready?','select',['Yes','No']],
+];
+const MASTER_DISPLAY_FIELDS = [
+  ['dataPresented','How is SCADA data presented?','select',['Local Monitor','Video Wall','Web Interface','Other']],
+  ['displayCount','Number and size of displays','text'],
+  ['multiScreen','Is multi-screen visualization supported?','select',['Yes','No']],
+  ['graphicQuality','Graphic resolution quality (e.g. HD, 4K)','text'],
+];
+const MASTER_ROOM_FIELDS = [
+  ['roomLabel','Physical room name/label','text'],
+  ['serverRackPresent','Is SCADA server rack present?','select',['Yes','No']],
+  ['acOperational','Is air conditioning present and operational?','select',['Yes','No']],
+  ['restrictedAccess','Is room secured with restricted access?','select',['Yes','No']],
+  ['upsInstalled','UPS installed?','select',['Yes','No']],
+  ['upsRating','UPS rating (kVA)','text'],
+  ['redundantPower','Redundant power supply present?','select',['Yes','No']],
+  ['fireSuppression','Fire suppression system available?','select',['Yes','No']],
+];
+const MASTER_NETWORK_FIELDS = [
+  ['workstationCount','Existing workstation count','text'],
+  ['switchesInstalled','Network switches installed (qty/model)','text'],
+  ['patchPanel','Patch panel installed and labeled?','select',['Yes','No']],
+  ['scadaOperational','Is the SCADA system operational from this room?','select',['Yes','No']],
+  ['gatewayLocation','Internet/cloud gateway location (if any)','text'],
+];
+const MASTER_PHOTO_ITEMS = [
+  'SCADA Server Rack','Air Conditioning Unit','Access Door with Lock/Security','UPS / Backup Power System',
+  'Fire Suppression System','Workstations / Terminals','Network Switches & Patch Panel','Monitor / Video Wall Display','Internet / Cloud Gateway',
+];
+
 let state = null;
 let currentKey = null;
 let saveTimer = null;
 let openSubIndex = {};
+let openSubTab = {};
 
 const store = {
   hasNative: (typeof window!=='undefined' && !!window.storage),
@@ -499,7 +548,7 @@ const store = {
 
 function blankState(client, siteName, siteType){
   return {
-    meta:{docNo:'CSI-SSA-'+Date.now().toString().slice(-6), client:client||'', siteName:siteName||'', siteType:siteType||'', createdAt:new Date().toISOString(), rev:0},
+    meta:{docNo:'FSR-PGT-'+Date.now().toString().slice(-6), client:client||'', siteName:siteName||'', siteType:siteType||'', createdAt:new Date().toISOString(), rev:0},
     core:{s01:{},s02:{},s03:{},s04:{},s07:{}},
     signal:SIGNAL_CARRIERS.reduce((a,c)=>{a[c]={bars:'',dbm:'',tech:'',loc:''};return a;},{}),
     signalRecommended:'',
@@ -510,6 +559,7 @@ function blankState(client, siteName, siteType){
     equipmentBySub:{},
     distribution:{fields:{}, feeders:[]},
     generation:{fields:{}, units:[]},
+    masterStation:{overview:{}, display:{}, room:{}, network:{}, photoFolder:'', photoItems:MASTER_PHOTO_ITEMS.reduce((a,c)=>{a[c]={taken:false,file:''};return a;},{}), comments:''},
     photos:[],
     signoff:{surveyedBy:'', reviewedBy:'', clientRep:''},
   };
@@ -796,14 +846,9 @@ loadRecent();
 const TABS = [
   {id:'overview', no:'—', label:'Overview'},
   {id:'core', no:'01', label:'Core survey'},
-  {id:'substations', no:'02', label:'Substations', types:['Transmission','Distribution']},
-  {id:'distribution', no:'03', label:'Distribution', types:['Distribution']},
-  {id:'generation', no:'04', label:'Generation', types:['Generation']},
-  {id:'signal', no:'05', label:'Cellular signal'},
-  {id:'instruments', no:'06', label:'Instrumentation'},
-  {id:'env', no:'07', label:'Environment'},
-  {id:'safety', no:'08', label:'Safety'},
-  {id:'closeout', no:'09', label:'Photos & sign-off'},
+  {id:'master', no:'02', label:'Master Station'},
+  {id:'substations', no:'03', label:'Substations'},
+  {id:'closeout', no:'04', label:'Photos & sign-off'},
 ];
 function visibleTabs(){
   return TABS.filter(t=> !t.types || t.types.includes(state.meta.siteType));
@@ -823,13 +868,8 @@ function boot(){
 
   renderOverview();
   renderCore();
-  renderSignal();
-  renderInstruments();
-  renderEnv();
-  renderSafety();
+  renderMaster();
   renderSubstations();
-  renderDistribution();
-  renderGeneration();
   renderCloseout();
 }
 
@@ -965,6 +1005,32 @@ const HINTS = {
   'signoff.surveyedBy':'Controtek engineer(s) who conducted the survey.',
   'signoff.reviewedBy':'Internal reviewer who checked the survey before use.',
   'signoff.clientRep':'Client-side person who witnessed/agrees with the findings, if available.',
+  'mo.scadaSoftware':'The vendor/version of the SCADA platform currently in use, if any.',
+  'mo.archDiagram':'Does the client have an as-built system architecture diagram you can obtain?',
+  'mo.totalInverters':'Only relevant for solar sites — total inverter count, existing vs. planned.',
+  'mo.inverterType':'Only relevant for solar sites — central or string inverter architecture.',
+  'mo.plannedInverterBrand':'Only relevant for solar sites — the brand/model being planned.',
+  'mo.ngcpPoints':'Are there control/monitoring points required by the National Grid Corporation?',
+  'mo.replicateFeatures':'Must every feature of the existing SCADA vendor\u2019s system be carried over?',
+  'mo.openProtocol':'Does the client want a non-proprietary, vendor-agnostic SCADA?',
+  'mo.cloudReady':'Does the new SCADA need to support cloud-based access/monitoring?',
+  'md.dataPresented':'How operators actually view the data day to day.',
+  'md.displayCount':'e.g. "6 x 55-inch video wall + 2 x 24-inch workstation monitors".',
+  'md.multiScreen':'Can the software span/synchronize views across multiple screens?',
+  'md.graphicQuality':'Resolution the displays support — affects how much detail can be shown at once.',
+  'mr.roomLabel':'The room\u2019s name or label as used on site (e.g. "Control Room A").',
+  'mr.serverRackPresent':'Is there a dedicated rack for SCADA server hardware?',
+  'mr.acOperational':'Confirm the AC is actually working, not just installed.',
+  'mr.restrictedAccess':'Is entry controlled (badge, lock, logbook)?',
+  'mr.upsInstalled':'Note the rating if yes — determines backup runtime for the room.',
+  'mr.upsRating':'UPS capacity in kVA.',
+  'mr.redundantPower':'Is there a second, independent power feed to this room?',
+  'mr.fireSuppression':'Suppression system present for the server/IT equipment.',
+  'mn.workstationCount':'How many operator workstations currently exist.',
+  'mn.switchesInstalled':'Note quantity and model/brand of network switches.',
+  'mn.patchPanel':'Is cabling terminated on a labeled patch panel (vs. loose/unlabeled)?',
+  'mn.scadaOperational':'Confirm the SCADA is actually live and running from this room today.',
+  'mn.gatewayLocation':'Where the internet/cloud connection physically enters or is located.',
 };
 function HINT(ns,key){ return HINTS[ns+'.'+key] || ''; }
 
@@ -1032,10 +1098,23 @@ function countAll(){
   let filled=0, max=0;
   Object.values(CORE_FIELDS).forEach(sec=>sec.fields.forEach(f=>{ max++; if(state.core[Object.keys(CORE_FIELDS).find(k=>CORE_FIELDS[k]===sec)][f[0]]) filled++; }));
   if(state.substationCount>0){
-    state.substations.forEach(s=>{ SUBSTATION_FIELDS.forEach(f=>{ max++; if(s.data[f[0]]) filled++; }); });
+    state.substations.forEach(s=>{
+      SUBSTATION_FIELDS.forEach(f=>{ max++; if(s.data[f[0]]) filled++; });
+      if(s.sub){
+        DIST_FIELDS.forEach(f=>{ max++; if(s.sub.distribution[f[0]]) filled++; });
+        CORE_FIELDS.s07.fields.forEach(f=>{ max++; if(s.sub.env[f[0]]) filled++; });
+      }
+    });
   }
-  DIST_FIELDS.forEach(f=>{ max++; if(state.distribution.fields[f[0]]) filled++; });
-  GEN_FIELDS.forEach(f=>{ max++; if(state.generation.fields[f[0]]) filled++; });
+  if(state.masterStation){
+    [MASTER_OVERVIEW_FIELDS, MASTER_DISPLAY_FIELDS, MASTER_ROOM_FIELDS, MASTER_NETWORK_FIELDS].forEach(arr=>{
+      arr.forEach(f=>{ max++; });
+    });
+    MASTER_OVERVIEW_FIELDS.forEach(f=>{ if(state.masterStation.overview[f[0]]) filled++; });
+    MASTER_DISPLAY_FIELDS.forEach(f=>{ if(state.masterStation.display[f[0]]) filled++; });
+    MASTER_ROOM_FIELDS.forEach(f=>{ if(state.masterStation.room[f[0]]) filled++; });
+    MASTER_NETWORK_FIELDS.forEach(f=>{ if(state.masterStation.network[f[0]]) filled++; });
+  }
   const pct = max? Math.round(filled/max*100) : 0;
   return {filled, max, pct};
 }
@@ -1172,11 +1251,22 @@ function renderSubstations(){
   });
   renderSubList();
 }
+function blankSubExtras(){
+  return {
+    distribution:{},
+    generation:{},
+    signal:SIGNAL_CARRIERS.reduce((a,c)=>{a[c]={bars:'',dbm:'',tech:'',loc:''};return a;},{}),
+    signalRecommended:'',
+    instruments:[],
+    env:{},
+    safety:{checked:{}, hazards:'', confinedSpace:'', arcFlash:''},
+  };
+}
 function resizeSubstations(n){
   const cur = state.substations.length;
   if(n>cur){
     for(let i=cur;i<n;i++){
-      state.substations.push({name:'Substation '+(i+1), data:{}});
+      state.substations.push({name:'Substation '+(i+1), data:{}, sub:blankSubExtras()});
       state.equipmentBySub[i] = [];
     }
   } else if(n<cur){
@@ -1186,6 +1276,14 @@ function resizeSubstations(n){
   renderSubList();
   queueSave();
 }
+const SUB_INNER_TABS = [
+  {id:'details', label:'Details'},
+  {id:'distribution', label:'Distribution'},
+  {id:'signal', label:'Signal'},
+  {id:'instruments', label:'Instruments'},
+  {id:'env', label:'Environment'},
+  {id:'safety', label:'Safety'},
+];
 function renderSubList(){
   const wrap = document.getElementById('subWrap');
   if(!wrap) return;
@@ -1193,6 +1291,7 @@ function renderSubList(){
     wrap.innerHTML = `<div style="color:var(--ink3);font-size:12.5px;padding:8px 2px;">No substations added yet — set the count above.</div>`;
     return;
   }
+  state.substations.forEach(s=>{ if(!s.sub) s.sub = blankSubExtras(); });
   wrap.innerHTML = state.substations.map((s,i)=>`
     <div class="substation ${openSubIndex[i]?'open':''}" data-idx="${i}">
       <div class="shead">
@@ -1202,17 +1301,10 @@ function renderSubList(){
         <span class="chev">▶</span>
       </div>
       <div class="sbody">
-        <div class="grid2">${SUBSTATION_FIELDS.map(f=>fieldHtml('f-'+f[0],f[1],f[2],f[3],s.data[f[0]],HINT('sub',f[0]))).join('')}</div>
-        <div style="margin:-8px 0 16px;">
-          <button class="btn small" data-gps="${i}" type="button">📍 Scan current location</button>
-          <span id="gpsHint-${i}" style="display:inline-block;margin-left:10px;font-size:11.5px;color:var(--ink3);"></span>
+        <div class="subtabs" data-subidx="${i}">
+          ${SUB_INNER_TABS.map(t=>`<button data-st="${t.id}" class="${(openSubTab[i]||'details')===t.id?'active':''}">${t.label}</button>`).join('')}
         </div>
-        <div style="margin-top:6px;">
-          <label style="margin-bottom:8px;">Major equipment inventory</label>
-          <table class="dyn"><thead><tr><th>Tag / Name</th><th>Type</th><th>Rating</th><th>Comms / Protocol</th><th>Notes</th><th></th></tr></thead>
-          <tbody data-eqbody="${i}"></tbody></table>
-          <button class="btn small addrow" data-addeq="${i}">+ Add equipment</button>
-        </div>
+        <div class="subpanel" data-subpanel="${i}"></div>
       </div>
     </div>`).join('');
 
@@ -1223,6 +1315,7 @@ function renderSubList(){
       const idx = card.dataset.idx;
       openSubIndex[idx] = !openSubIndex[idx];
       card.classList.toggle('open', openSubIndex[idx]);
+      if(openSubIndex[idx]) renderSubPanel(idx, openSubTab[idx]||'details');
     });
   });
   wrap.querySelectorAll('[data-namefor]').forEach(inp=>{
@@ -1233,30 +1326,155 @@ function renderSubList(){
     });
     inp.addEventListener('click', e=>e.stopPropagation());
   });
-  wrap.querySelectorAll('.sbody [data-bind]').forEach(inp=>{
+  wrap.querySelectorAll('.subtabs button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = btn.closest('.subtabs').dataset.subidx;
+      openSubTab[i] = btn.dataset.st;
+      btn.closest('.subtabs').querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn));
+      renderSubPanel(i, btn.dataset.st);
+    });
+  });
+  state.substations.forEach((s,i)=>{ if(openSubIndex[i]) renderSubPanel(i, openSubTab[i]||'details'); });
+}
+
+function renderSubPanel(i, which){
+  const el = document.querySelector(`[data-subpanel="${i}"]`);
+  if(!el) return;
+  if(which==='distribution') return renderSubDistribution(i, el);
+  if(which==='signal') return renderSubSignal(i, el);
+  if(which==='instruments') return renderSubInstruments(i, el);
+  if(which==='env') return renderSubEnv(i, el);
+  if(which==='safety') return renderSubSafety(i, el);
+  return renderSubDetails(i, el);
+}
+
+function bindGrid(el, fieldsArr, dataObj){
+  el.querySelectorAll('[data-bind]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{ dataObj[inp.dataset.bind] = inp.value; queueSave(); });
+  });
+}
+
+function renderSubDetails(i, el){
+  const s = state.substations[i];
+  el.innerHTML = `
+    <div class="grid2">${SUBSTATION_FIELDS.map(f=>fieldHtml('f-'+f[0],f[1],f[2],f[3],s.data[f[0]],HINT('sub',f[0]))).join('')}</div>
+    <div style="margin:-8px 0 16px;">
+      <button class="btn small" data-gps="${i}" type="button">📍 Scan current location</button>
+      <span id="gpsHint-${i}" style="display:inline-block;margin-left:10px;font-size:11.5px;color:var(--ink3);"></span>
+    </div>
+    <div style="margin-top:6px;">
+      <label style="margin-bottom:8px;">Major equipment inventory</label>
+      <table class="dyn"><thead><tr><th>Tag / Name</th><th>Type</th><th>Rating</th><th>Comms / Protocol</th><th>Notes</th><th></th></tr></thead>
+      <tbody data-eqbody="${i}"></tbody></table>
+      <button class="btn small addrow" data-addeq="${i}">+ Add equipment</button>
+    </div>`;
+  el.querySelectorAll('[data-bind]').forEach(inp=>{
     inp.addEventListener('input', ()=>{
-      const idx = inp.closest('.substation').dataset.idx;
       const key = inp.dataset.bind.replace('f-','');
-      state.substations[idx].data[key] = inp.value;
+      state.substations[i].data[key] = inp.value;
       if(key==='voltageClass'||key==='subType'){
-        inp.closest('.substation').querySelector('.meta').textContent =
-          (state.substations[idx].data.voltageClass||'—')+' · '+(state.substations[idx].data.subType||'type n/a');
+        const metaEl = document.querySelector(`.substation[data-idx="${i}"] .meta`);
+        if(metaEl) metaEl.textContent = (state.substations[i].data.voltageClass||'—')+' · '+(state.substations[i].data.subType||'type n/a');
       }
       queueSave();
     });
   });
-  state.substations.forEach((s,i)=>renderEqRows(i));
-  wrap.querySelectorAll('[data-addeq]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const i = btn.dataset.addeq;
-      if(!state.equipmentBySub[i]) state.equipmentBySub[i]=[];
-      state.equipmentBySub[i].push({tag:'',type:'',rating:'',comms:'',notes:''});
-      renderEqRows(i); queueSave();
+  el.querySelector('[data-gps]').addEventListener('click', (e)=>{ e.stopPropagation(); captureGps(i); });
+  el.querySelector('[data-addeq]').addEventListener('click', ()=>{
+    if(!state.equipmentBySub[i]) state.equipmentBySub[i]=[];
+    state.equipmentBySub[i].push({tag:'',type:'',rating:'',comms:'',notes:''});
+    renderEqRows(i); queueSave();
+  });
+  renderEqRows(i);
+}
+
+function renderSubDistribution(i, el){
+  const s = state.substations[i];
+  el.innerHTML = `<p class="desc">Feeder-level detail for this specific substation.</p>
+    <div class="grid2">${DIST_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],s.sub.distribution[f[0]],HINT('dist',f[0]))).join('')}</div>`;
+  bindGrid(el, DIST_FIELDS, s.sub.distribution);
+}
+function renderSubGeneration(i, el){
+  const s = state.substations[i];
+  el.innerHTML = `<p class="desc">Only fill in if this substation has on-site generation (e.g. a standby genset).</p>
+    <div class="grid2">${GEN_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],s.sub.generation[f[0]],HINT('gen',f[0]))).join('')}</div>`;
+  bindGrid(el, GEN_FIELDS, s.sub.generation);
+}
+function renderSubSignal(i, el){
+  const s = state.substations[i];
+  el.innerHTML = `<p class="desc">Cellular readings taken at this specific substation.</p>
+    <table class="dyn"><thead><tr><th>Provider</th><th>Technology</th><th>Bars (0–5)</th><th>dBm</th><th>Measurement location</th></tr></thead>
+    <tbody>${SIGNAL_CARRIERS.map(c=>`<tr data-carrier="${c}">
+      <td style="font-weight:600;">${c}</td>
+      <td><input data-f="tech" value="${escapeHtml(s.sub.signal[c].tech)}" placeholder="4G/LTE"></td>
+      <td><input data-f="bars" value="${escapeHtml(s.sub.signal[c].bars)}" placeholder="0-5"></td>
+      <td><input data-f="dbm" value="${escapeHtml(s.sub.signal[c].dbm)}" placeholder="-95"></td>
+      <td><input data-f="loc" value="${escapeHtml(s.sub.signal[c].loc)}" placeholder="Near panel"></td>
+    </tr>`).join('')}</tbody></table>
+    <div class="field" style="margin-top:16px;"><label>Recommended provider for this substation</label>
+    <input id="signalRec-${i}" value="${escapeHtml(s.sub.signalRecommended)}"></div>`;
+  el.querySelectorAll('tr[data-carrier] input').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const c = inp.closest('tr').dataset.carrier;
+      s.sub.signal[c][inp.dataset.f] = inp.value;
+      queueSave();
     });
   });
-  wrap.querySelectorAll('[data-gps]').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{ e.stopPropagation(); captureGps(btn.dataset.gps); });
+  el.querySelector(`#signalRec-${i}`).addEventListener('input', e=>{ s.sub.signalRecommended = e.target.value; queueSave(); });
+}
+function renderSubInstruments(i, el){
+  const s = state.substations[i];
+  el.innerHTML = `<p class="desc">Instruments/field devices specific to this substation.</p>
+    <table class="dyn"><thead><tr><th>Tag</th><th>Measurement</th><th>Signal</th><th>Brand / Model</th><th>Notes</th><th></th></tr></thead>
+    <tbody data-subinstr="${i}"></tbody></table>
+    <button class="btn small addrow" data-addsubinstr="${i}">+ Add instrument</button>`;
+  renderSubInstrRows(i);
+  el.querySelector('[data-addsubinstr]').addEventListener('click', ()=>{
+    s.sub.instruments.push({tag:'',measurement:'',signal:'',brand:'',notes:''});
+    renderSubInstrRows(i); queueSave();
   });
+}
+function renderSubInstrRows(i){
+  const tbody = document.querySelector(`[data-subinstr="${i}"]`);
+  if(!tbody) return;
+  const rows = state.substations[i].sub.instruments;
+  tbody.innerHTML = rows.map((row,j)=>`<tr data-j="${j}">
+    ${['tag','measurement','signal','brand','notes'].map(f=>`<td><input data-f="${f}" value="${escapeHtml(row[f])}"></td>`).join('')}
+    <td><button class="rm" data-rm="${j}">×</button></td></tr>`).join('') ||
+    `<tr><td colspan="6" style="color:var(--ink3);font-size:12px;padding:8px 0;">No instruments added yet.</td></tr>`;
+  tbody.querySelectorAll('input').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const j = inp.closest('tr').dataset.j;
+      state.substations[i].sub.instruments[j][inp.dataset.f] = inp.value;
+      queueSave();
+    });
+  });
+  tbody.querySelectorAll('[data-rm]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ state.substations[i].sub.instruments.splice(btn.dataset.rm,1); renderSubInstrRows(i); queueSave(); });
+  });
+}
+function renderSubEnv(i, el){
+  const s = state.substations[i];
+  const fields = CORE_FIELDS.s07.fields;
+  el.innerHTML = `<p class="desc">Physical conditions at this specific substation.</p>
+    <div class="grid2">${fields.map(f=>fieldHtml(f[0],f[1],f[2],f[3],s.sub.env[f[0]],HINT('s07',f[0]))).join('')}</div>`;
+  bindGrid(el, fields, s.sub.env);
+}
+function renderSubSafety(i, el){
+  const s = state.substations[i];
+  el.innerHTML = `<p class="desc">PPE and hazards specific to this substation.</p>
+    <div>${SAFETY_ITEMS.map(item=>`<label class="checkrow"><input type="checkbox" data-ppe="${item}" ${s.sub.safety.checked[item]?'checked':''}><span class="lbl">${item}</span></label>`).join('')}</div>
+    <div class="grid2" style="margin-top:16px;">
+      <div class="field" style="grid-column:1/-1;"><label>Site hazards (narrative)</label><textarea id="subhaz-${i}">${escapeHtml(s.sub.safety.hazards)}</textarea></div>
+      <div class="field"><label>Confined-space entry involved</label><select id="subconf-${i}"><option value="">—</option><option ${s.sub.safety.confinedSpace==='Yes'?'selected':''}>Yes</option><option ${s.sub.safety.confinedSpace==='No'?'selected':''}>No</option></select></div>
+      <div class="field"><label>Arc-flash risk / boundary posted</label><select id="subarc-${i}"><option value="">—</option><option ${s.sub.safety.arcFlash==='Yes'?'selected':''}>Yes</option><option ${s.sub.safety.arcFlash==='No'?'selected':''}>No</option></select></div>
+    </div>`;
+  el.querySelectorAll('[data-ppe]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{ s.sub.safety.checked[cb.dataset.ppe] = cb.checked; queueSave(); });
+  });
+  el.querySelector(`#subhaz-${i}`).addEventListener('input', e=>{ s.sub.safety.hazards = e.target.value; queueSave(); });
+  el.querySelector(`#subconf-${i}`).addEventListener('change', e=>{ s.sub.safety.confinedSpace = e.target.value; queueSave(); });
+  el.querySelector(`#subarc-${i}`).addEventListener('change', e=>{ s.sub.safety.arcFlash = e.target.value; queueSave(); });
 }
 function captureGps(i){
   const hint = document.getElementById('gpsHint-'+i);
@@ -1308,6 +1526,83 @@ function renderEqRows(i){
 }
 
 /* --- Distribution --- */
+/* --- Master Station (SCADA / IT room) --- */
+function renderMaster(){
+  const el = document.getElementById('panel-master');
+  if(!state.masterStation){
+    state.masterStation = {overview:{}, display:{}, room:{}, network:{}, photoFolder:'', photoItems:MASTER_PHOTO_ITEMS.reduce((a,c)=>{a[c]={taken:false,file:''};return a;},{}), comments:''};
+  }
+  const ms = state.masterStation;
+  el.innerHTML = `
+    <div class="card">
+      <h2><span class="tag">MST</span> Master Station — SCADA System Overview</h2>
+      <p class="desc">One dedicated survey for the central control room / SCADA master station — separate from individual field substations.</p>
+      <div class="grid2" id="moGrid"></div>
+    </div>
+    <div class="card">
+      <h2><span class="tag">MST</span> Photo Upload — IT Room Survey</h2>
+      <p class="desc">For documentation purposes, capture clear photos of each component below. Suggested file naming: ITRoom_[ComponentName]_[Date].jpg</p>
+      <div class="field"><label>Upload folder location</label><input id="msPhotoFolder" value="${escapeHtml(ms.photoFolder)}" placeholder="e.g. shared drive path or note"></div>
+      <table class="dyn"><thead><tr><th>Component / Area</th><th>Photo taken</th><th>File name / notes</th></tr></thead>
+      <tbody>${MASTER_PHOTO_ITEMS.map(item=>`<tr data-item="${escapeHtml(item)}">
+        <td style="font-weight:600;">${item}</td>
+        <td style="text-align:center;"><input type="checkbox" data-mpcheck="${escapeHtml(item)}" ${ms.photoItems[item] && ms.photoItems[item].taken?'checked':''} style="width:16px;height:16px;accent-color:var(--accent);"></td>
+        <td><input data-mpfile="${escapeHtml(item)}" value="${escapeHtml((ms.photoItems[item]&&ms.photoItems[item].file)||'')}" placeholder="filename or note"></td>
+      </tr>`).join('')}</tbody></table>
+    </div>
+    <div class="card">
+      <h2><span class="tag">MST</span> Display Information</h2>
+      <div class="grid2" id="mdGrid"></div>
+    </div>
+    <div class="card">
+      <h2><span class="tag">MST</span> Room Specifications</h2>
+      <div class="grid2" id="mrGrid"></div>
+    </div>
+    <div class="card">
+      <h2><span class="tag">MST</span> Network Infrastructure</h2>
+      <div class="grid2" id="mnGrid"></div>
+    </div>
+    <div class="card">
+      <h2><span class="tag">MST</span> Comments / Notes</h2>
+      <div class="field" style="margin-bottom:0;"><textarea id="msComments" style="min-height:90px;">${escapeHtml(ms.comments)}</textarea></div>
+    </div>`;
+
+  const moGrid = el.querySelector('#moGrid');
+  moGrid.innerHTML = MASTER_OVERVIEW_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],ms.overview[f[0]],HINT('mo',f[0]))).join('');
+  bindGrid(moGrid, MASTER_OVERVIEW_FIELDS, ms.overview);
+
+  const mdGrid = el.querySelector('#mdGrid');
+  mdGrid.innerHTML = MASTER_DISPLAY_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],ms.display[f[0]],HINT('md',f[0]))).join('');
+  bindGrid(mdGrid, MASTER_DISPLAY_FIELDS, ms.display);
+
+  const mrGrid = el.querySelector('#mrGrid');
+  mrGrid.innerHTML = MASTER_ROOM_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],ms.room[f[0]],HINT('mr',f[0]))).join('');
+  bindGrid(mrGrid, MASTER_ROOM_FIELDS, ms.room);
+
+  const mnGrid = el.querySelector('#mnGrid');
+  mnGrid.innerHTML = MASTER_NETWORK_FIELDS.map(f=>fieldHtml(f[0],f[1],f[2],f[3],ms.network[f[0]],HINT('mn',f[0]))).join('');
+  bindGrid(mnGrid, MASTER_NETWORK_FIELDS, ms.network);
+
+  el.querySelector('#msPhotoFolder').addEventListener('input', e=>{ ms.photoFolder = e.target.value; queueSave(); });
+  el.querySelectorAll('[data-mpcheck]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const item = cb.dataset.mpcheck;
+      if(!ms.photoItems[item]) ms.photoItems[item] = {taken:false,file:''};
+      ms.photoItems[item].taken = cb.checked;
+      queueSave();
+    });
+  });
+  el.querySelectorAll('[data-mpfile]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const item = inp.dataset.mpfile;
+      if(!ms.photoItems[item]) ms.photoItems[item] = {taken:false,file:''};
+      ms.photoItems[item].file = inp.value;
+      queueSave();
+    });
+  });
+  el.querySelector('#msComments').addEventListener('input', e=>{ ms.comments = e.target.value; queueSave(); });
+}
+
 function renderDistribution(){
   const el = document.getElementById('panel-distribution');
   el.innerHTML = `<div class="card">
