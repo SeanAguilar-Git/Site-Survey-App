@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Controtek — Site Survey Checklist</title>
+<title>Site Survey Checklist</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -28,6 +28,45 @@
     --sans:'Space Grotesk',system-ui,sans-serif;
     --body:'Inter',system-ui,sans-serif;
   }
+  :root[data-theme="light"]{
+    --bg:#F6F4EF;
+    --panel:#FFFFFF;
+    --panel2:#F2EFE8;
+    --line:#DCD7CB;
+    --line-soft:#EAE6DC;
+    --accent:#D9581F;
+    --accent-ink:#FFFFFF;
+    --accent-soft:rgba(217,88,31,.10);
+    --amber:#9A5F00;
+    --red:#C43A32;
+    --green:#187A54;
+    --ink:#1C1A16;
+    --ink2:#5B564C;
+    --ink3:#8C8676;
+  }
+  :root[data-theme="light"] body{
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  }
+  :root[data-theme="light"] #topbar::before{opacity:.28;}
+  :root[data-theme="light"] .card,
+  :root[data-theme="light"] #gate .card,
+  :root[data-theme="light"] .substation,
+  :root[data-theme="light"] #recent .item,
+  :root[data-theme="light"] .sectionlist a{
+    box-shadow:0 1px 2px rgba(28,26,22,.04);
+  }
+  :root[data-theme="light"] .status::before{opacity:.7;}
+  body,.card,.substation,input,select,textarea,.btn,#topbar,#mobileBar,#mobileMoreSheet{
+    transition:background-color .18s ease, border-color .18s ease, color .18s ease;
+  }
+  .iconbtn{
+    background:var(--panel); border:1.5px solid var(--line); color:var(--ink2);
+    width:34px; height:34px; border-radius:2px; font-size:14px; flex:none;
+    display:inline-flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent;
+  }
+  .iconbtn:hover{border-color:var(--accent); color:var(--ink);}
   *{box-sizing:border-box;}
   body{
     margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
@@ -60,7 +99,6 @@
     opacity:.55;
   }
   #topbar{position:sticky;}
-  #topbar .brand{font-family:var(--mono); font-size:11px; color:var(--accent); letter-spacing:.12em; white-space:nowrap; text-transform:uppercase;}
   #topbar .title{font-family:var(--sans); font-weight:600; font-size:15px; white-space:nowrap;}
   #docno{font-family:var(--mono); font-size:11.5px; color:var(--ink2); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .status{font-family:var(--mono); font-size:10.5px; color:var(--ink3); white-space:nowrap; min-width:120px; text-align:right; text-transform:uppercase; letter-spacing:.04em;}
@@ -82,7 +120,7 @@
 
   #shell{max-width:920px; margin:0 auto; padding:26px 24px 80px;}
 
-  #gate{max-width:460px; margin:11vh auto; text-align:center; padding:0 18px;}
+  #gate{max-width:460px; margin:11vh auto; text-align:center; padding:0 18px; position:relative;}
   #gate .mark{font-family:var(--mono); color:var(--accent); font-size:11px; letter-spacing:.18em; margin-bottom:12px; text-transform:uppercase;}
   #gate h1{font-family:var(--sans); font-size:27px; font-weight:700; margin:0 0 8px; letter-spacing:-.01em;}
   #gate p{color:var(--ink2); font-size:13.5px; margin:0 0 28px; line-height:1.6;}
@@ -243,7 +281,6 @@
     body.app-open #shell{padding-bottom:96px;}
     #topbar .btn{display:none;}
     #topbar{padding:11px 14px; gap:10px;}
-    #topbar .brand{display:none;}
     #topbar .title{font-size:14px;}
     #docno{font-size:11px;}
     #shell{padding:18px 14px 40px;}
@@ -276,7 +313,8 @@
 <body>
 
 <div id="gate">
-  <div class="mark">Controtek Solutions</div>
+  <button class="iconbtn" id="themeToggleGate" type="button" title="Toggle light/dark mode" style="position:absolute; top:18px; right:20px;">🌙</button>
+  <div class="mark">Field Survey Tool</div>
   <h1>Site Survey Checklist</h1>
   <p>Power Generation, Transmission &amp; Distribution — fill it out on site, it saves itself.</p>
   <div class="card">
@@ -312,10 +350,10 @@
 
 <div id="app" style="display:none;">
   <div id="topbar">
-    <div class="brand">Controtek</div>
     <div class="title">Site Survey</div>
     <div id="docno">—</div>
     <div class="status" id="saveStatus">idle</div>
+    <button class="iconbtn" id="themeToggleTop" type="button" title="Toggle light/dark mode">🌙</button>
     <button class="btn small primary" id="btnSave">Save survey</button>
     <button class="btn small" id="btnHome">Home</button>
     <button class="btn small" id="btnExport">Save file (.json)</button>
@@ -336,6 +374,7 @@
 
 <div id="sheetBackdrop"></div>
 <div id="mobileMoreSheet">
+  <button class="sheetbtn" id="mTheme">🌙 Toggle light / dark mode</button>
   <button class="sheetbtn" id="mExport">📄 Save file (.json)</button>
   <button class="sheetbtn" id="mPrint">🖨️ Print / PDF</button>
   <button class="sheetbtn danger" id="mClear">🗑️ Clear form</button>
@@ -519,6 +558,39 @@ const MASTER_PHOTO_ITEMS = [
   'SCADA Server Rack','Air Conditioning Unit','Access Door with Lock/Security','UPS / Backup Power System',
   'Fire Suppression System','Workstations / Terminals','Network Switches & Patch Panel','Monitor / Video Wall Display','Internet / Cloud Gateway',
 ];
+
+/* ---------------------------------------------------------------
+   THEME (light / dark)
+--------------------------------------------------------------- */
+function getPreferredTheme(){
+  try{
+    const saved = localStorage.getItem('ctk:theme');
+    if(saved==='light' || saved==='dark') return saved;
+  }catch(e){}
+  try{
+    if(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+  }catch(e){}
+  return 'dark';
+}
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  try{ localStorage.setItem('ctk:theme', t); }catch(e){}
+  const icon = t==='light' ? '☀️' : '🌙';
+  ['themeToggleTop','themeToggleGate'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = icon;
+  });
+  const mBtn = document.getElementById('mTheme');
+  if(mBtn) mBtn.textContent = (t==='light' ? '☀️' : '🌙') + ' Toggle light / dark mode';
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(cur==='light' ? 'dark' : 'light');
+}
+applyTheme(getPreferredTheme());
+document.getElementById('themeToggleGate').addEventListener('click', toggleTheme);
+document.getElementById('themeToggleTop').addEventListener('click', toggleTheme);
+document.getElementById('mTheme').addEventListener('click', ()=>{ toggleTheme(); closeMoreSheet(); });
 
 let state = null;
 let currentKey = null;
@@ -903,7 +975,7 @@ const HINTS = {
   's01.gps':'Lat/long taken at the main gate or control building.',
   's01.address':'Street address, barangay/municipality, or a description anyone can navigate by.',
   's01.surveyDate':'The date you conducted this survey.',
-  's01.engineers':'Names of the Controtek staff who conducted the survey.',
+  's01.engineers':'Names of the field staff who conducted the survey.',
   's01.siteContact':'Who on the client side can grant access or answer questions — include their role.',
   's01.accessConstraints':'Gate codes, escort requirements, permits, or key custodian info.',
   's01.lotoRequired':'Does the client require a formal permit-to-work / lockout-tagout before touching equipment?',
@@ -1002,7 +1074,7 @@ const HINTS = {
   'gen.loadSharing':'Can multiple units share load automatically when running in parallel?',
   'gen.ats':'For standby units — is there an automatic transfer switch?',
   'gen.totalUnits':'How many generating units the client operates across all sites.',
-  'signoff.surveyedBy':'Controtek engineer(s) who conducted the survey.',
+  'signoff.surveyedBy':'The engineer(s) who conducted the survey.',
   'signoff.reviewedBy':'Internal reviewer who checked the survey before use.',
   'signoff.clientRep':'Client-side person who witnessed/agrees with the findings, if available.',
   'mo.scadaSoftware':'The vendor/version of the SCADA platform currently in use, if any.',
