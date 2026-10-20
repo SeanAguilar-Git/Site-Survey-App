@@ -113,6 +113,22 @@ ol.recs{padding-left:20px}ol.recs li{margin:7px 0}
 .maplg span{display:inline-flex;align-items:center;gap:6px}.maplg .pin{width:20px;height:20px;font-size:11px;border-width:1px}.maplg .pin.m{width:22px;height:22px;font-size:12px}
 @media print{.mapbox{height:3.7in;break-inside:avoid}.leaflet-control-container{display:none}}
 .dlg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}.dlgb{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;max-width:380px;width:100%}.dlgb .btn{margin:4px 4px 0 0}@media print{.dlg{display:none!important}}
+
+/* ---- v3: multi-photo, personnel, photo viewer ---- */
+.phg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.phs{border:1px solid var(--bd);border-radius:10px;overflow:hidden;background:var(--card)}
+.phi{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;cursor:zoom-in;background:var(--c2)}
+.phi img{width:100%;height:100%;object-fit:cover;display:block}
+.phl{font-size:12px;color:var(--mu)}
+.phb2{display:flex;gap:4px;flex-wrap:wrap;padding:6px;justify-content:center}.phb2 .chip{margin:0;font-size:12px;padding:6px 10px}
+.phn{display:flex;align-items:center;gap:6px;font-size:12px;flex:none}
+.dlgb.phb{max-width:94vw;width:auto;text-align:center}.phb img{max-width:100%;max-height:70vh;display:block;margin:8px auto;border-radius:8px}
+.assist{border:2px solid #E8301A}
+.arow{display:flex;gap:8px;align-items:flex-start;margin:8px 0}
+.anum{width:26px;height:26px;border-radius:50%;background:#E8301A;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;margin-top:8px;flex:none}
+.afl{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:6px}.arow>.chip{margin:6px 0 0}
+@media(max-width:480px){.phg{grid-template-columns:1fr 1fr}.afl{grid-template-columns:1fr}}
+@media print{.phg,.phb2{display:none}}
 </style><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script></head><body>
 <div id="topbar"><img alt="Controtek" src="data:image/png;base64,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Wh+chsEHT8/zFi9e/OGHH95+++0vv/zywoULlVKZTKYs1QqfwbfYYotjjjnm29/+9vjx44UQhUKB6chaBIiUKp3CMKyqqnrttdfuu+++l156ae7cuW1tbUzsSgklsxYAdXV13/3ud7/97W/vsssuLBBorctSHFbiwQcfvOyyy5iYMnUo/bZQKFx99dWHH344Ez7WITAF5w3puu6CBQvuueeeZ5555u23316xYgWATCbjui6LEUwNM5nMNttsc8EFFxx++OGZTKa6upr1eEwBywISAQRB8Ic//OH3v/99HMfV1dXZbDaVShERt18Gpp5KqXnz5h100EFlOW+YeEkpr7/++sMOO4z1ZgDy+fxpp502a9as0ou5S47jOI6zzz77/Pa3vy2bjUwmw5Gn/HAfeeSRP/zhDx9++GFHR4fW2t567Nix//jHPwYOHLiqabd8mqnVkiVL7r777vvvv3/u3Lm5XI5ZQlnEDAtzAwYMGDFixHe/+93jjjsOQG1tLQ+HqbNlqKV9/tOf/vQ///M/hUKhuro6CAIppeu6M2fOrOyVEIKnKwzD008/nWejbH5qa2tvueWWcePGsWvyqgaIInV2Xbetre2+++77+9///s477yxbtowfVi6XK5sQY4zv+8ccc8wxxxwzbty4rbfeWinVx4FWvu8bYzKZzJw5c6ZMmbLNNtuUfsshtCzQBEEQx/G+++679dZb/8dJOXByHelc2mlXKsipLpBJGxdQgYl9ipRydSSUkBJCCqFct9SLuUZWIaxu0nVEaeQhRLVvYohYkkobRyAXe45flULcGUZaCcnsZKVvtMgDETwnpjiOiaSAIUlwDaSB1Kl0pGUcAfSFwouDeiBhgAAy7KBcOtY5crNGgUxIOkUI3IySogoaFAtSUksoCSgYSRFIgqSxaXW+yK0jSt3p1hZCiDlz5jz44IOPPfbYu+++yzufD4YdHR1lOm4m63PmzLn++utvuumm8ePHX3jhhXvvvXdTUxNHd6857Emf2+zs7PzXv/718MMPP/74411dXWEYlh6HS7VwVvfV2tp6ww03/PGPfxwzZsxhhx128MEH77LLLl1dXT2nLQnDcN68eb7vB0HANozSb5mEcces0okpeBAEH3/88aRJk1566aVp06ahqHXhI20QBFaLwoP66KOPzjvvvEmTJh188MGnnnoqi4arUtOn0+lC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FjED/Ku2trZ7772XDUvLly9PpVLZbHY9dpuni6XMOXPmXHLJJS+//DKvSc5Kbo9ELNjFcbznnnteddVVq7WSbgrYYCxHInCIlIEygaLYIbgElwKPIp/IoUpOY6G0QCx8CJ8EIsgYaYgM4BmRIUgDwZYbNvoXG4klIEEK2iHtwCgYxQyOjAvtQXsiUhQrTdJwNU8S+IKuGMCADGAyZBQMoNMw6SIbEUaIWBJJQBoShlPdQAi+E+gL9V7xpFT8t/c7NwzDGTNm7L333ixYWPNDt85RqwVLA0zZJ02a9I9//MOSrbIrWaHEi5iIOjs7L7nkkmuuuYbdcHs9jBJYmxA76b788stHH330m2++ycJZr5qiYpUaPqFLKZ944omrr77anvjWGp7neZ533XXXPf7445uUKpzLqwBgMsTHER7sfffd98Ybb3Dxld4yCVa45XK5m2666fLLL29paWHbOzter2Offd9funTpT37yk5deekkUPa1Z8bsuzKxXYFF41qxZ++23H28lG1JjlYFrDpYgAfAanjp16v/5P/+npqZmvRvqWZ9hjHniiSe+/e1vv/rqq+ysyNpm65nJ3ZBSHnfccZMnT173R9Y32HAsJzIyIBVABiQLpApwAuOEgRtGTkBCozv5ZuVPSUH7gnxJEgbCCEm+Q76IPUe70I4sikeSimYSiUgiUiAZQ0aQIakQMiAVkorICbUbxm4QOnEsSUuCJDjQzHKEkMXOSMBFl0faQewi66LDEaErQlcuN6or7xrtQXtxAXFeUKRAUkK4WMkBAfvvl/KP9o7rCCHefvvto446avr06eyUbLVA3bpIrhZsAGDtfDabPe200x555BF0d4y1/EYp1draev75519//fWspVkLVlcKPoOzooxNLB9//PFRRx315JNP9pa4K6WWLFkybdq0WbNmzZo16/e///0JJ5ywdOnSSvfi3oLndtGiRaeffvrTTz+9Lk2tR7CQ2tnZKaVsb29/66235s2b98EHH3z22WcPPPDA5ZdfbtVWpiJsdrVYunTphAkTJk6cuGLFCjab6Yow3rUAi8iO47z++uus0UWRyjPRXJfG1xxKqenTpx933HEzZ87kVW3VZez40KvW2E7J+k8W3W6++eYDDzxw2bJl67g7ysCOmk8//fTJJ588Z84cnjQOtbG6Td5KTU1N11577f3337/lllv6vr9+ha0NhA3mPmDI10ZqA2NcY6Qw0FqCPG1cMpIksEqreiwFHBEKFQmkFEgiFgJwFavONDwjIul4JgXSIAAKpCRpEq4gIfWXj7oCEFCAkehM5XN+tn9cBeXw5xKAjIRxiwk7IZylxvdNnIIqwMlLSkG6RmRDL45SJlYDFaVYsceXC6Go6BJtvdSEzcHT+1I98+bNu/DCCz/++GMUQ7r4/B6G4VrwGz4TlZ6A8vn82WefPXz48FGjRlWWZGd+0Nra+sADD7B5gHlVpedYr1CasIDt6vl8fuHChWz03nXXXde8Ka31Nddcw67JTGd5p7GH21r3kDvJg21pafn9739/yCGHrEtr6wssGrIz9NNPP/3CCy90dHTwYLnSF9tF2EGgV9RcKXXXXXf9+c9/ZhHWGtL5hT3UrwVY5OID05IlS66//vrdd9992223VUqlUql1WUi9QktLy09+8pMPP/wQRTcTHunabSXmN9b9hDfLCy+88Oc///myyy5bj91WSj300EPnnntuPp9n/wW23rFXjn3EW2211YUXXjhhwgStNYdebRbFADcYyyEH5AIOhBMJzxGOEi5IKm2UMSBZToVL3pKIIQKgIOGt9DjmBGfCAQSygcjUzMuk61DtxrEjSLmGQLEwRhrpqJXxMd21/HnDiraqcOvF/VGvSBnhSCWhhVahg1ggBwN0eoucZoq7hpMmofIkumLTBLjtqaVNW7qxoVTku4BRWkgiCA3F+XJU2Q3LuE4PU1Vcx+wQ9etf//qjjz4CwJ64fHi3ZkMAHI/iui6fbVEinaCod7JnXmtIt+0DyOfzkyZN+uMf/8jbhsPy7Zo2xrzxxhsXXHCB7WHpCZrb5CXOEZRxHLOLFBM+vpL3RqU/EgC+HYe/zJ49e/LkyePHj7cxHPZ6HgVbnoiI6Sl/NW/evC89YSF4imxwKI+a2ScVHV5t0Dv7dLHNvLQd6/7ged4rr7xy3333HX/88Tyftk0OWWcqwDSI+UHZkZmZKxXTkJQ9cevUxz4XHDTO/tbsRlU2Om6BExzwjbjn7BpgzXUcToQSrZHNDeF5XqFQ4MfBM5DP57PZ7OTJkz3PC8PQMuxSizqHOqHoNqaLeQSYl1hfAFEMxa1MHMB+FrNmzfrhD3/44IMPcifZMcE6f6NonODblbmT8FfWJbJbhZj9JAgCDv/i08Pdd9/91ltvAUin05yXiCm4nUbLRYYNGzZmzJiBAwdyAHU2m83n89OnT3///ffz+TxH7TDdZ/HIbhbf92+77bZjjjlm6NChvu/n83neSr3V8ZbO8C233PLTn/60s7OT3/Kztn75KAaGX3fddSeccELpRPXqjhsLGzRCdaW5A0LY18IKAz0RYnb+InvZl67tV+OddFj/Q/aqMtLJBQIEQ5CalDGCBClpVjn128CZv2TLu3/akfWrwmrTFkXSgZLL/aDR0QrS1DaEXz9gbyef9uJUlQdSg4wirYURyDnNqI3S1QIxoCAdAojYKFQcbTcTsCbTJEQul6uqqmpvb29vb3/sscf42K6KqdIs+UBxqwRBEARBbW3tqFGjxo4d269fP6XUwoULFyxY8O67737++edc/zgMw7INzBSzrq6Oj1Ff+9rXjDE2CQo7O6XT6ZtuuqnSxCKKOcq4A57ncT/HjRu33XbbDR8+nJ2np02bNm/evPnz57e0tERRxDGY7e3tpU2xqw83OGXKlJ///OcDBw5kVbUdpqViPAQm090ekC2LtXSEuUsqlaqrq0un00xEli1bZpvKZrOVMYOWbfC83X777QcddFBDQ4OdGSFEfX19oVBgcimEyGQyixYtymQyZW5Lxhj2ZyWipqamsqdQU1PT0dHR3NzMKXa4/zZXTaVfWQ+yiz0NMO32fZ+JfnV1dSaTSafTzGyUUsOGDWtra2tqamK2UVVVddttt82dOzedTrPbWOVsML/npzx8+PDBgwePHj160KBBcRy3trZ+8skns2bNmjNnDjvd2SQLlY/JGPP8888/9thjJ598sta6o6ODnafZJsFu90opTuXQrbsg0/empibmHKWd5IKhzA94JVsF2qRJk5YvX24toHw72zg/teHDh19++eX77rtvc3Mzu+2g6NDIIau33HLL+++/b1UF7DaGkvw6c+fOveiii+6///4gCDiMobdmFVYA5PN53/cnTZr0k5/8hEuYWy9tlDjO8RHhggsuOOGEE3peG5smNtGkCD0gUOl43G5VUkljEBME1wc1ECQEBARIrSrntJ+tH/KO9+CFnywPl6ZSXldAQgFqhYyNgIy9z+uHLDzpwqP9DBABAnABQSvLHggX2oUHCM7LFku1XnLZgA+5vG/vvvvuhQsX8mm9LOTN2iqiKPrKV75y3HHHHXTQQdtuu21NTY0upvOL43jGjBm33nrr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wrlzeNOFYRjH8ZAhQ6699tqnnnrqwgsv7N+/P7P5yszZAFhRwWy7MtkzK7o5TqCmpqbnMfI2zOfzp5xyyplnnskbIYoi7n/ZxR0dHVdcccWrr766ySrWNlImaT9d2HNfne2QDtq72lNKSAkthRYylkIQybVNzSy9arnVVpCKoDxIDytDOiG1EYa4BujagdLAEL96DFKeKzplmEZUB0pBhdLt8N3AlQ3KHcAZByAgEQmQgILpNV+3cV5M8oho5513vueee957773nn3/+ueee4wAxexwr9ULu6uqqq6sbPHgwx+4ddthhu+yyC6cM6K2Rk/ceU3PHcWpray+99NJTTz314Ycf/uc//zl37tx58+a1tbUx+1k5SUTWLdtxnP79+++8884jR4484ogjdtxxR+aFvc2yxQfGr3zlK6ya75asDB06lNO/92qAHR0dI0aM4BQMlQKiMaapqSkIgtIsXhbM4zmJS3t7e69ia3hWjTHpdHq1UzFkyJC9997bepGVDd913erqatbt2Gyha96TUnA0KBEde+yxe+yxxwcffDBlypSPP/543rx52WyWA3psiBXLBGEYptPp/v37b7nllmPGjDnooIP22msvthFaRrLa+7Lok8/nx40bx3R/zQUd7gkL5SxV9HAxN1tXV3fxxRefeuqp999//9SpUz/55JP58+evWLGCTw9UBP+En9HQoUMHDx689957H3300cOHD/c8jzPhMsuh7hLlsYNcc3PzvvvuW5k2kA1dSqk1WbG80mpqaqIouvrqq/P5/Jw5c3zfZ3NsR0dH6cUcfvTKK69885vfXP30bQyspTpiHaFjAx0rTvXd1S6r0oDBSpt9seLAWkHmDfIx6qoDx8/HulZ6MgbIkBsFMpJwPaxt5IcGCJAdwFKIEDoFXQ34UBoyC2RBChgA1BGgpRYiL6GFSSP2IFYWH10TlD0RXkNSSj7HcdquXC63fPnyFStWdHR0dHV12XBOKeWQIUMaGxvr6+vr6+v5jMZBM0zjekXrqSTLoT39mWJGYWPMihUrPv/885aWls7OTk74aJVsgwcPrqurq66ubmho4NMr6/f5SNirFAOleYIrh8CEJooipom9UsuwO6mNvKtkOTx1HGxYRlZ4cmQxj2SvWE4+n2fBiANEen4odto571HZANmN3iZ2XJeo0tJQIdYXMTo6OpYsWdLa2trR0cGiJFN5NsX169ePq5PxOYPnk7WgsphJr1tXq9IhWEmCQzjXfBR8MaeuWBOOa9V3KPo4dHV1tba2trW18Z7ikClWW6VSqf79+zc1NTU1NfFPWBeH4qrjD/nuZTeyy9LGOJddYA8Q3crupbACJbM3e57jiS2TZkoVxZumq/TGYTkJEiRIkOA/EJsiG0yQIEGCBP+WSFhOggQJEiToIyQsJ0GCBAkS9BESlpMgQYIECfoICctJkCBBggR9hITlJEiQIEGCPkLCchIkSJAgQR8hYTkJEiRIkKCPkLCcBAkSJEjQR0hYToIECRIk6CMkLCdBggQJEvQREpaTIEGCBAn6CAnLSZAgQYIEfYSE5SRIkCBBgj5CwnISJEiQIEEfIWE5CRIkSJCgj5CwnAQJEiRI0EdIWE6CBAkSJOgjJCwnQYIECRL0ERKWkyBBggQJ+ggJy0mQIEGCBH2EhOUkSJAgQYI+QsJyEiRIkCBBHyFhOQkSJEiQoI+QsJwECRIkSNBHSFhOggQJEiToIyQsJ0GCBAkS9BESlpMgQYIECfoICctJkCBBggR9hITlJEiQIEGCPkLCchIkSJAgQR8hYTkJEiRIkKCPkLCcBAkSJEjQR0hYToIECRIk6CP8f2BRPKWdbHSYAAAAAElFTkSuQmCC"><div class="title">Power Distribution Site Survey</div>
 <button class="btn primary noprint" onclick="savePdf()">Save PDF</button>
@@ -148,30 +164,31 @@ const LOGO=(document.querySelector("#topbar img")||{}).src||"";
 const KEY="cpd1";
 
 /* ---------- State + storage ---------- */
-let S={tab:"Overview",info:{date:today},subs:[],op:{},master:{name:"",address:"",lat:"",lng:"",acc:""}};
+let S={tab:"Overview",info:{date:today,assist:[]},subs:[],op:{},master:{name:"",address:"",barangay:"",town:"",province:"",lat:"",lng:"",acc:""}};
 try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
 const val=v=>String(v??"").trim();
 const OLDT=["Power Transformer","Distribution Transformer","Circuit Breaker","Recloser","Protection Relay","Revenue Meter","Capacitor Bank","Battery Bank","Station Generator","Surge Arrester","Other Equipment"];
 (function migrate(){
  if(!Array.isArray(S.subs))S.subs=[];
  if(!S.info)S.info={date:today};
+ S.info.assist=(Array.isArray(S.info.assist)?S.info.assist:[]).map(p=>typeof p==="string"?{name:p,role:""}:{name:(p&&p.name)||"",role:(p&&p.role)||""});
  if(!S.op)S.op={};
- S.master=Object.assign({name:"",address:"",lat:"",lng:"",acc:""},S.master||{});
+ S.master=Object.assign({name:"",address:"",barangay:"",town:"",province:"",lat:"",lng:"",acc:""},S.master||{});
  if(S.eq&&S.eq.length){
   const eq=S.eq.map(r=>{const o=Object.assign({},r);o.type=typeof r.type==="number"?(OLDT[r.type]||"Other Equipment"):r.type;return o});
-  S.subs.push({id:uid(),name:"Imported equipment (rename / reassign)",code:"",address:"",lat:"",lng:"",acc:"",updated:Date.now(),equipment:eq});
+  S.subs.push({id:uid(),name:"Imported equipment (rename / reassign)",code:"",address:"",barangay:"",town:"",province:"",rating:"",feedIn:"",feedOut:"",lat:"",lng:"",acc:"",updated:Date.now(),equipment:eq});
  }
  delete S.eq;delete S.chk;   /* checklist data removed */
  if(!TABS.includes(S.tab))S.tab="Overview";
  S.subs.forEach(s=>{
   s.equipment=s.equipment||[];
-  ["name","code","address","lat","lng"].forEach(k=>{if(s[k]==null)s[k]=""});
-  s.acc=s.acc==null?"":String(s.acc);delete s.pick;
+  ["name","code","address","barangay","town","province","rating","feedIn","feedOut","lat","lng"].forEach(k=>{if(s[k]==null)s[k]=""});
+  s.acc=s.acc==null?"":String(s.acc);delete s.sig;delete s.pick;
   s.equipment.forEach(e=>{
    e.type=NT(e.type);if(!TYPES.some(x=>x.n===e.type))e.type="Other";
    if(e.mf===undefined){e.mf=(e.make||"").startsWith("Other")&&e.makeOther?e.makeOther:(e.make||"")}
    {const L=TY(e.type).m;if(e.mfSel===undefined){if(!val(e.mf))e.mfSel="";else if(L.includes(e.mf))e.mfSel=e.mf;else{e.mfSel="Others";e.mfOther=e.mf}}}
-   e.mfOther=e.mfOther||"";
+   e.mfOther=e.mfOther||"";e.photos=Array.isArray(e.photos)?e.photos:[];
    e.model=e.model||"";e.serial=e.serial||"";e.rating=e.rating||"";e.remarks=e.remarks||"";
    if(e.pn&&!/Part no\./.test(e.remarks))e.remarks=(e.remarks?e.remarks+"\n":"")+"Part no.: "+e.pn;
    {const m={"Dry contact":["Standard I/O"],"Hardwired":["Standard I/O"],"Pulse":["Standard I/O"],"Modbus":["Modbus RTU","Modbus TCP/IP"],"Modbus TCP":["Modbus TCP/IP"]},ok=TY(e.type).p;
@@ -181,7 +198,7 @@ const OLDT=["Power Transformer","Distribution Transformer","Circuit Breaker","Re
  });
 })();
 let ST=null,SWARN=0;
-function saveNow(){clearTimeout(ST);try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){if(!SWARN++||SWARN%10==0)toast("Could not save: browser storage is full. Remove some photos or export a backup.");return false}}
+function saveNow(){clearTimeout(ST);try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){if(!SWARN++||SWARN%10==0)toast("Could not save: browser storage is full. Export a backup and free some space.");return false}}
 function save(){clearTimeout(ST);ST=setTimeout(saveNow,350)}
 addEventListener("pagehide",saveNow);
 document.addEventListener("visibilitychange",()=>{if(document.hidden)saveNow()});
@@ -194,7 +211,13 @@ const chip=(l,on,fn,c="")=>`<button class="chip ${c} ${on?"on":""}" onclick="${f
 const T=si=>{S.subs[si].updated=Date.now();save()};
 const nEq=()=>S.subs.reduce((a,s)=>a+s.equipment.length,0);
 const hasGps=o=>val(o.lat)!==""&&val(o.lng)!==""&&isFinite(+o.lat)&&isFinite(+o.lng)&&Math.abs(+o.lat)<=90&&Math.abs(+o.lng)<=180;
-const hasPh=e=>typeof e.photo==="string"&&e.photo.indexOf("data:image/")===0;
+const hasPh=e=>Array.isArray(e.photos)&&e.photos.length>0;
+const phCount=e=>Array.isArray(e.photos)?e.photos.length:0;
+const nn=v=>{const x=parseInt(v,10);return isFinite(x)&&x>=0?x:0};
+const numIn=el=>{el.value=el.value.replace(/\D/g,"").slice(0,3)};
+const assistList=()=>(S.info.assist||[]).filter(p=>val(p.name));
+const fullAddr=o=>[o.address,o.barangay,o.town,o.province].map(val).filter(Boolean).join(", ");
+const feedTxt=s=>(val(s.feedIn)||"-")+" in / "+(val(s.feedOut)||"-")+" out";
 const subName=s=>val(s.name)||"Unnamed Substation";
 const gpsTxt=o=>hasGps(o)?`${val(o.lat)}, ${val(o.lng)}${val(o.acc)?` (±${val(o.acc)} m)`:""}`:"";
 const mapLink=o=>`https://www.google.com/maps?q=${encodeURIComponent(val(o.lat)+","+val(o.lng))}`;
@@ -205,10 +228,10 @@ const eqMeta=r=>"Manufacturer: "+(val(r.mf)||"—")+" · Model: "+(val(r.model)|
 const gpsLine=s=>hasGps(s)?`<span class="good">GPS: ✔ Captured</span>`:`<span class="bad">GPS: ✖ Not captured</span>`;
 const nav=()=>document.getElementById("nav").innerHTML=TABS.map(t=>`<button class="${t==S.tab?"on":""}" onclick="S.tab='${t}';saveNow();R()">${TICON[t]||""} ${t}</button>`).join("");
 let CF=null,CT,GST={};
-function ask(id,fn){if(CF===id){CF=null;clearTimeout(CT);fn();saveNow();R()}else{CF=id;clearTimeout(CT);CT=setTimeout(()=>{CF=null;R()},3000);if(id==="reset")toast("Tap “Clear form” again within 3 seconds to erase ALL data.");R()}}
+function ask(id,fn){if(CF===id){CF=null;clearTimeout(CT);fn();gcSoon();saveNow();R()}else{CF=id;clearTimeout(CT);CT=setTimeout(()=>{CF=null;R()},3000);if(id==="reset")toast("Tap “Clear form” again within 3 seconds to erase ALL data.");R()}}
 
 /* ---------- Substation actions ---------- */
-function addSub(){const s={id:uid(),name:"",code:"",address:"",lat:"",lng:"",acc:"",updated:Date.now(),equipment:[]};S.subs.push(s);S.op["s"+s.id]=true;saveNow();R()}
+function addSub(){const s={id:uid(),name:"",code:"",address:"",barangay:"",town:"",province:"",rating:"",feedIn:"",feedOut:"",lat:"",lng:"",acc:"",updated:Date.now(),equipment:[]};S.subs.push(s);S.op["s"+s.id]=true;saveNow();R()}
 /* live header: updates title / code / GPS badge / count without re-rendering */
 function updHead(si){const s=S.subs[si],g=id=>document.getElementById(id+s.id);
  const n=g("sn_");if(n)n.textContent=subName(s);
@@ -234,14 +257,14 @@ function gps(si){gpsId(S.subs[si].id)}
 function gpsId(id){
  if(!navigator.geolocation){GST[id]={t:"err",m:"Location is not supported by this browser. Type the coordinates instead."};R();return}
  GST[id]={t:"busy",m:"Getting location, please wait..."};R();
- const ok=p=>{const q=id==="master"?S.master:S.subs.find(x=>x.id===id);if(!q)return;q.lat=p.coords.latitude.toFixed(6);q.lng=p.coords.longitude.toFixed(6);q.acc=String(Math.round(p.coords.accuracy));if(id!=="master")q.updated=Date.now();GST[id]={t:"ok",m:"Location Captured Successfully"};saveNow();R()};
+ const ok=p=>{const q=id==="master"?S.master:S.subs.find(x=>x.id===id);if(!q)return;q.lat=p.coords.latitude.toFixed(6);q.lng=p.coords.longitude.toFixed(6);q.acc=String(Math.round(p.coords.accuracy));if(id!=="master")q.updated=Date.now();GST[id]={t:"ok",m:"Location Captured Successfully"};saveNow();R();autoAddr(id,false)};
  const fail=e=>{const done=perm=>{GST[id]={t:"err",m:gpsMsg(e,perm)};R()};try{navigator.permissions&&navigator.permissions.query?navigator.permissions.query({name:"geolocation"}).then(r=>done(r.state),()=>done("")):done("")}catch(x){done("")}};
  navigator.geolocation.getCurrentPosition(ok,e=>{
   if(e.code!=1){GST[id]={t:"busy",m:"Getting location (retrying with lower accuracy)..."};R();navigator.geolocation.getCurrentPosition(ok,fail,{enableHighAccuracy:false,timeout:15000,maximumAge:120000})}
   else fail(e)},{enableHighAccuracy:true,timeout:12000,maximumAge:0})}
 
 /* ---------- Equipment actions ---------- */
-function addEq(si,type){const s=S.subs[si],e={id:uid(),type,mf:"",mfSel:"",mfOther:"",model:"",serial:"",rating:"",remarks:"",proto:[],cond:"",photo:""};s.equipment.push(e);s.pick=false;S.op["e"+e.id]=true;S.op["s"+s.id]=true;T(si);R()}
+function addEq(si,type){const s=S.subs[si],e={id:uid(),type,mf:"",mfSel:"",mfOther:"",model:"",serial:"",rating:"",remarks:"",proto:[],cond:"",photos:[]};s.equipment.push(e);s.pick=false;S.op["e"+e.id]=true;S.op["s"+s.id]=true;T(si);R()}
 function eqLive(si,ei){const s=S.subs[si],r=s.equipment[ei],a=document.getElementById("en_"+r.id),b=document.getElementById("em_"+r.id);if(a)a.textContent=eqTitle(s,ei);if(b)b.textContent=eqMeta(r)}
 function eqP(si,ei,f,v){S.subs[si].equipment[ei][f]=v;T(si);eqLive(si,ei)}
 function setType(si,ei,v){const r=S.subs[si].equipment[ei];r.type=v;r.proto=(r.proto||[]).filter(x=>TY(v).p.includes(x));const L=TY(v).m;if(r.mfSel&&r.mfSel!=="Others"&&!L.includes(r.mfSel)){r.mfSel="";r.mf=""}T(si);R()}
@@ -250,23 +273,114 @@ function setMfO(si,ei,v){const r=S.subs[si].equipment[ei];r.mfOther=v;r.mf=val(v
 function eqCond(si,ei,v){const r=S.subs[si].equipment[ei];r.cond=r.cond===v?"":v;T(si);R()}
 function eqProto(si,ei,j){const r=S.subs[si].equipment[ei],v=TY(r.type).p[j],p=r.proto.indexOf(v);p<0?r.proto.push(v):r.proto.splice(p,1);T(si);R()}
 
-/* ---------- Photo handling (camera / gallery -> resized JPEG Base64 -> localStorage) ---------- */
-function photoIn(si,ei,inp){
- const f=inp.files&&inp.files[0];inp.value="";if(!f)return;
- if(!(/^image\/(jpeg|png|webp)$/i.test(f.type)||/\.(jpe?g|png|webp)$/i.test(f.name))){toast("Unsupported photo format. Please use JPG, JPEG, PNG or WEBP.");return}
- const sid=S.subs[si].id,eid=S.subs[si].equipment[ei].id,url=URL.createObjectURL(f),im=new Image();
- toast("Processing photo...");
- im.onload=()=>{
-  const M=1280;let w=im.naturalWidth,h=im.naturalHeight;const k=Math.min(1,M/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);
-  const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);URL.revokeObjectURL(url);
-  const d=c.toDataURL("image/jpeg",0.7),s=S.subs.find(q=>q.id===sid),r=s&&s.equipment.find(q=>q.id===eid);
-  if(!r){toast("That equipment record no longer exists.");return}
-  const old=r.photo;r.photo=d;s.updated=Date.now();
-  if(!saveNow()){r.photo=old;R();return}
-  toast("Photo saved");R()};
- im.onerror=()=>{URL.revokeObjectURL(url);toast("Could not read that image. Try another photo.")};
- im.src=url}
-function photoDel(si,ei){const r=S.subs[si].equipment[ei];r.photo="";T(si);saveNow();R()}
+/* ---------- Photos: IndexedDB storage (large capacity), auto-resize, up to 3 per equipment ---------- */
+/* Each photo is stored twice in IndexedDB: a 1600 px "full" JPEG and an 800 px "preview" JPEG.
+   Only small metadata ({id,w,h,at}) is kept in localStorage, so photo count is no longer limited to ~5 MB. */
+const MAXP=3,FULLPX=1600,PREVPX=800;
+let DB=null,PU={},PQP=Promise.resolve(),LBU="",SINFO="";
+const bufBlob=(b,t)=>new Blob([b],{type:t||"image/jpeg"});
+const blobBuf=b=>b.arrayBuffer?b.arrayBuffer():new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsArrayBuffer(b)});
+const toBlobJ=(c,q)=>new Promise((res,rej)=>{c.toBlob(b=>b?res(b):rej(new Error("Could not encode the image.")),"image/jpeg",q)});
+function idbOpen(){return new Promise((res,rej)=>{if(!window.indexedDB){rej(new Error("IndexedDB is unavailable"));return}const r=indexedDB.open("cpd-photos",1);r.onupgradeneeded=()=>{r.result.createObjectStore("photos",{keyPath:"id"})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error||new Error("Could not open photo storage"))})}
+function dbTx(mode,fn){return new Promise((res,rej)=>{if(!DB){rej(new Error("Photo storage is not ready"));return}let t,o;try{t=DB.transaction("photos",mode);o=fn(t.objectStore("photos"))}catch(e){rej(e);return}t.oncomplete=()=>res(o&&"result" in o?o.result:undefined);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error||new Error("Storage transaction aborted"))})}
+const dbPut=r=>dbTx("readwrite",st=>st.put(r));
+const dbGet=id=>dbTx("readonly",st=>st.get(id));
+const dbDel=id=>dbTx("readwrite",st=>st.delete(id));
+const dbKeys=()=>dbTx("readonly",st=>st.getAllKeys());
+const phIds=()=>S.subs.flatMap(s=>s.equipment.flatMap(e=>(e.photos||[]).map(p=>p.id)));
+async function loadPrev(id){if(PU[id])return;try{const r=await dbGet(id);if(r&&r.prev)PU[id]=URL.createObjectURL(bufBlob(r.prev))}catch(e){}}
+function dropPhoto(id){if(PU[id]){try{URL.revokeObjectURL(PU[id])}catch(e){}delete PU[id]}dbDel(id).catch(()=>{})}
+async function gcPhotos(){if(!DB)return;try{const keep=new Set(phIds());for(const k of await dbKeys())if(!keep.has(k))dropPhoto(k)}catch(e){}}
+function gcSoon(){PQP=PQP.then(gcPhotos).catch(()=>{})}
+
+/* ---- decoding / compression ---- */
+async function decodeImg(blob){
+ const u=URL.createObjectURL(blob),im=new Image();im.src=u;
+ try{if(im.decode)await im.decode();else await new Promise((a,b)=>{im.onload=a;im.onerror=()=>b(new Error("decode failed"))})}catch(e){URL.revokeObjectURL(u);throw e}
+ if(!im.naturalWidth){URL.revokeObjectURL(u);throw new Error("empty image")}
+ return{im,u}}
+function loadScript(u){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=u;s.onload=res;s.onerror=()=>rej(new Error("script load failed"));document.head.appendChild(s)})}
+async function heicToJpeg(f){
+ if(!window.heic2any)await loadScript("https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js");
+ const r=await window.heic2any({blob:f,toType:"image/jpeg",quality:0.85});return Array.isArray(r)?r[0]:r}
+const isImgFile=f=>/^image\//i.test(f.type||"")||/\.(jpe?g|png|webp|hei[cf])$/i.test(f.name||"");
+async function processImage(file){
+ const heic=/hei[cf]/i.test(file.type||"")||/\.hei[cf]$/i.test(file.name||"");
+ let d;
+ try{d=await decodeImg(file)}catch(e){
+  if(!heic)throw new Error("This file is not a readable image.");
+  try{d=await decodeImg(await heicToJpeg(file))}catch(e2){throw new Error("This HEIC photo could not be converted. On iPad it converts automatically; otherwise set Camera > Formats > Most Compatible.")}}
+ const {im,u}=d,nw=im.naturalWidth,nh=im.naturalHeight;
+ const mk=async(src,sw,sh,max,q)=>{const k=Math.min(1,max/Math.max(sw,sh)),w=Math.max(1,Math.round(sw*k)),h=Math.max(1,Math.round(sh*k)),c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(src,0,0,w,h);return{c,w,h,blob:await toBlobJ(c,q)}};
+ let F=null,P=null;
+ try{F=await mk(im,nw,nh,FULLPX,0.8);P=await mk(F.c,F.w,F.h,PREVPX,0.72)}
+ finally{try{URL.revokeObjectURL(u)}catch(e){}im.src="";if(F)F.c.width=F.c.height=0;if(P)P.c.width=P.c.height=0}   /* free canvas memory (important on iPad) */
+ return{full:await blobBuf(F.blob),prev:await blobBuf(P.blob),w:F.w,h:F.h}}
+
+/* ---- add / replace / remove ---- */
+function photosIn(si,ei,inp,rep){
+ const files=[...(inp.files||[])];inp.value="";if(!files.length)return;
+ const s=S.subs[si],e=s.equipment[ei],sid=s.id,eid=e.id;
+ PQP=PQP.then(()=>photoJob(sid,eid,files,rep)).catch(err=>console.error(err))}
+async function photoJob(sid,eid,files,rep){
+ const find=()=>{const s=S.subs.find(x=>x.id===sid),e=s&&s.equipment.find(x=>x.id===eid);return e?{s,e}:null};
+ let f=find();if(!f)return;f.e.photos=f.e.photos||[];
+ const isRep=rep!=null&&!!f.e.photos[rep];
+ if(!isRep){const room=MAXP-f.e.photos.length;
+  if(room<=0){toast("This equipment already has "+MAXP+" photos. Remove one first, or use Replace.");return}
+  if(files.length>room){toast("Only "+room+" more photo(s) allowed (maximum "+MAXP+"). Saving the first "+room+".");files=files.slice(0,room)}}
+ else files=files.slice(0,1);
+ if(!DB){toast("Photo storage is not available in this browser.");return}
+ let ok=0;const bad=[];
+ for(let i=0;i<files.length;i++){const fl=files[i];
+  if(!isImgFile(fl)){bad.push((fl.name||"file")+": not an image");continue}
+  toast("Saving photo "+(i+1)+" of "+files.length+"...");
+  try{
+   let p;try{p=await processImage(fl)}catch(e1){await new Promise(r=>setTimeout(r,400));p=await processImage(fl)}   /* one automatic retry */
+   const id=uid()+"p";
+   await dbPut({id,full:p.full,prev:p.prev,w:p.w,h:p.h,at:Date.now()});
+   PU[id]=URL.createObjectURL(bufBlob(p.prev));
+   f=find();if(!f){dropPhoto(id);return}
+   f.e.photos=f.e.photos||[];const meta={id,w:p.w,h:p.h,at:Date.now()};
+   if(isRep&&f.e.photos[rep]){const old=f.e.photos[rep];f.e.photos[rep]=meta;dropPhoto(old.id)}else f.e.photos.push(meta);
+   f.s.updated=Date.now();saveNow();ok++;R();
+  }catch(err){bad.push((fl.name||"photo")+": "+(err&&err.name==="QuotaExceededError"?"device storage is full":(err&&err.message)||"failed"))}
+  await new Promise(r=>setTimeout(r,30));   /* let the iPad breathe between photos */
+ }
+ storageInfo();
+ toast(bad.length?"Saved "+ok+" photo(s). Problem: "+bad[0]+(bad.length>1?" (+"+(bad.length-1)+" more)":""):"Saved "+ok+" photo"+(ok==1?"":"s"))}
+function photoDel(si,ei,idx){const e=S.subs[si].equipment[ei],p=e.photos&&e.photos[idx];if(!p)return;e.photos.splice(idx,1);dropPhoto(p.id);T(si);saveNow();R()}
+function phSlot(si,ei,pi,p,dk){const u=PU[p.id],rk=dk+"x"+pi;
+ return`<div class="phs"><div class="phi" onclick="viewPhoto(${si},${ei},${pi})">${u?`<img alt="Photo ${pi+1}" src="${u}" loading="lazy" decoding="async">`:`<div class="phl">Loading…</div>`}</div>
+<div class="phb2"><label class="chip">Replace<input class="fi" type="file" accept="image/*" onchange="photosIn(${si},${ei},this,${pi})"></label>${chip(CF===rk?"Tap to confirm":"Remove",0,`ask('${rk}',()=>photoDel(${si},${ei},${pi}))`)}</div></div>`}
+async function viewPhoto(si,ei,idx){
+ const e=S.subs[si].equipment[ei],p=e.photos&&e.photos[idx];if(!p)return;
+ let d=document.getElementById("phdlg");if(!d){d=document.createElement("div");d.id="phdlg";d.className="dlg";document.body.appendChild(d)}
+ d.innerHTML=`<div class="dlgb phb"><div class="desc">${esc(eqTitle(S.subs[si],ei))} - photo ${idx+1} of ${e.photos.length}</div><img id="phfull" alt="" src="${PU[p.id]||""}"><div><button class="btn primary" onclick="closePhoto()">Close</button></div></div>`;
+ d.style.display="flex";
+ try{const r=await dbGet(p.id);if(r&&r.full){if(LBU)URL.revokeObjectURL(LBU);LBU=URL.createObjectURL(bufBlob(r.full));const im=document.getElementById("phfull");if(im)im.src=LBU}}catch(x){}}
+function closePhoto(){const d=document.getElementById("phdlg");if(d)d.style.display="none";if(LBU){URL.revokeObjectURL(LBU);LBU=""}}
+
+/* ---- startup: open DB, upgrade old Base64 photos, load previews ---- */
+async function migrateLegacyPhotos(){
+ const list=[];
+ S.subs.forEach(s=>s.equipment.forEach(e=>{if(typeof e.photo==="string"&&e.photo.indexOf("data:image/")===0)list.push(e);else if("photo" in e)delete e.photo}));
+ if(!list.length)return;
+ let n=0;
+ for(const e of list){n++;toast("Upgrading saved photos ("+n+" of "+list.length+")...");
+  try{const blob=await (await fetch(e.photo)).blob(),p=await processImage(blob),id=uid()+"p";
+   await dbPut({id,full:p.full,prev:p.prev,w:p.w,h:p.h,at:Date.now()});
+   e.photos=e.photos||[];if(e.photos.length<MAXP)e.photos.push({id,w:p.w,h:p.h,at:Date.now()});
+   delete e.photo;saveNow()}catch(err){console.error(err)}}
+ toast("Saved photos upgraded.")}
+async function storageInfo(){try{if(navigator.storage&&navigator.storage.estimate){const e=await navigator.storage.estimate();SINFO="Photo and data storage used on this device: "+((e.usage||0)/1048576).toFixed(0)+" MB"+(e.quota?" (about "+(e.quota/1073741824).toFixed(1)+" GB available).":".")}}catch(x){}}
+async function initPhotos(){
+ try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{})}catch(e){}
+ try{DB=await idbOpen()}catch(e){toast("Photo storage is unavailable in this browser (private mode?). Photos cannot be saved.");return}
+ await migrateLegacyPhotos();
+ for(const id of phIds())await loadPrev(id);
+ if(S.subs.length)await gcPhotos();
+ await storageInfo();R()}
 
 /* ---------- Analysis ---------- */
 const PW=p=>/61850|60870|dnp3|modbus|dlms|snmp/i.test(p)?1:/standard i\/o/i.test(p)?0.5:0;
@@ -275,22 +389,18 @@ const lvl=x=>x==null?"Not assessed":x>=0.6?"High":x>=0.3?"Medium":"Low";
 const rdc=l=>l==="Not assessed"?"NA":l;
 function A(){
  const subs=S.subs,I=S.info,eqs=subs.flatMap(s=>s.equipment.map((e,i)=>({s,e,i}))),nS=subs.length,nE=eqs.length;
- const gpsN=subs.filter(hasGps).length,phN=eqs.filter(x=>hasPh(x.e)).length;
- let tot=3,done=["client","site","who"].filter(k=>val(I[k])).length;
- subs.forEach(s=>{tot+=4;done+=[s.name,s.code,s.address].filter(val).length+(hasGps(s)?1:0)});
- eqs.forEach(({e})=>{tot+=5;done+=[e.mf,e.model,e.serial,e.rating].filter(val).length+(hasPh(e)?1:0)});
- const pct=Math.round(done/tot*100),cnt={};
+ const gpsN=subs.filter(hasGps).length,phN=eqs.filter(x=>hasPh(x.e)).length,photoTotal=eqs.reduce((t,x)=>t+phCount(x.e),0),feedInT=subs.reduce((t,s)=>t+nn(s.feedIn),0),feedOutT=subs.reduce((t,s)=>t+nn(s.feedOut),0);
+ const cnt={};
  eqs.forEach(({e})=>cnt[e.type]=(cnt[e.type]||0)+1);
  const miss=f=>eqs.filter(x=>!val(x.e[f]));
  const scArr=eqs.filter(x=>TY(x.e.type).sc),mtArr=eqs.filter(x=>TY(x.e.type).meter);
  const avg=a=>a.length?a.reduce((t,x)=>t+cs(x.e),0)/a.length:null;
  const sc=avg(scArr),mt=avg(mtArr);
- const dc=nS?(pct+gpsN/nS*100+(nE?phN/nE*100:0))/3:null;
+ const np=eqs.filter(x=>val(x.e.model)&&val(x.e.serial)&&val(x.e.rating)).length;
+ const dc=nS?(gpsN/nS*100+(nE?phN/nE*100:0)+(nE?np/nE*100:0))/3:null;
  const per=subs.map(s=>{const n=s.equipment.length,crit=s.equipment.filter(e=>TY(e.type).crit).length,ph=s.equipment.filter(hasPh).length;
-  let t=4+5*n,d=[s.name,s.code,s.address].filter(val).length+(hasGps(s)?1:0);
-  s.equipment.forEach(e=>{d+=[e.mf,e.model,e.serial,e.rating].filter(val).length+(hasPh(e)?1:0)});
-  return{s,n,crit,ph,pct:Math.round(d/t*100)}});
- return{nS,nE,gpsN,phN,pct,cnt,eqs,per,scArr,mtArr,sc,mt,dc,
+  return{s,n,crit,ph,pc:s.equipment.reduce((t,e)=>t+phCount(e),0)}});
+ return{nS,nE,gpsN,phN,photoTotal,feedInT,feedOutT,np,cnt,eqs,per,scArr,mtArr,sc,mt,dc,
   mSerial:miss("serial"),mRating:miss("rating"),mModel:miss("model"),mMf:miss("mf"),
   poor:eqs.filter(x=>x.e.cond==="Poor"),scL:lvl(sc),mtL:lvl(mt),dcL:dc==null?"Not assessed":dc>=75?"High":dc>=45?"Medium":"Low"}}
 const a_nS_or_master=(a,m)=>a.nS||m.length;
@@ -304,54 +414,16 @@ function observations(a){
   const tx=a.mSerial.filter(x=>/Transformer/.test(x.e.type)).length;
   o.push(a.mSerial.length?`${nm(a.mSerial.length,"equipment record")} ${a.mSerial.length==1?"is":"are"} missing a serial number${tx?` (${nm(tx,"transformer")})`:""}.`:"All equipment records have serial numbers.");
   o.push(a.mRating.length?`${nm(a.mRating.length,"equipment record")} ${a.mRating.length==1?"has":"have"} no rating recorded.`:"All equipment records have ratings.");
-  o.push(`Photos are available for ${a.phN} of ${a.nE} assets (${Math.round(a.phN/a.nE*100)}%).`);
+  o.push(`Photos are available for ${a.phN} of ${a.nE} assets (${a.photoTotal} photos in total).`);
   if(a.poor.length)o.push(`${nm(a.poor.length,"asset")} reported in poor condition.`);
   if(a.scArr.length){const n0=a.scArr.filter(x=>cs(x.e)==0).length;if(n0)o.push(`${n0} of ${a.scArr.length} switching/protection assets have no communication interface recorded.`)}
  }else o.push("No equipment has been recorded yet.");
  const ne=a.per.filter(p=>!p.n).length;if(ne)o.push(`${nm(ne,"substation")} ${ne==1?"has":"have"} no equipment recorded.`);
  return o}
-function recs(a){
- const r=[],add=(p,t)=>r.push({p,t});
- if(!a.nS){add(0,"Add the substations to be surveyed, capture each GPS location, then record the equipment inside each one.");return r}
- a.per.forEach(({s,n})=>{const N=subName(s),eq=s.equipment;
-  if(!n)add(1,`Add the equipment inventory for ${N}.`);
-  if(!hasGps(s))add(0,`Capture the GPS location for ${N}.`);
-  else if(val(s.acc)&&+s.acc>30)add(1,`Validate GPS coordinates for ${N} (reported accuracy ±${val(s.acc)} m).`);
-  else if(!val(s.acc))add(2,`Validate the manually entered GPS coordinates for ${N}.`);
-  const sc=eq.filter(e=>TY(e.type).sc);
-  if(sc.length){const av=sc.reduce((t,e)=>t+cs(e),0)/sc.length;
-   if(av<0.6)add(av<0.3?0:1,`Install a communication gateway at ${N} to bring ${nm(sc.length,"switching/protection asset")} into SCADA.`);
-   else add(2,`${N} is a good candidate for an early SCADA integration pilot.`)}
-  const rl=eq.filter(e=>TY(e.type).relay&&cs(e)<1);
-  if(rl.length)add(1,`Prioritize connectivity assessment for protection relay systems at ${N} (${nm(rl.length,"relay")}).`);
-  const mt=eq.filter(e=>TY(e.type).meter&&cs(e)<1);
-  if(mt.length)add(1,`Assess communication options for ${nm(mt.length,"revenue meter")} at ${N}.`);
-  const np=eq.filter(e=>!val(e.serial)||!val(e.rating)||!val(e.model)).length;
-  if(np)add(1,`Verify missing equipment nameplates at ${N} (${nm(np,"record")} with missing model, serial or rating).`);
-  const nph=eq.filter(e=>!hasPh(e)).length;
-  if(nph)add(2,`Capture photos for the remaining ${nm(nph,"undocumented equipment record")} at ${N}.`);
-  const pr=eq.filter(e=>e.cond==="Poor").length;
-  if(pr)add(0,`Schedule inspection or refurbishment for ${nm(pr,"asset")} in poor condition at ${N}.`)});
- if(!val(S.info.client)||!val(S.info.site)||!val(S.info.who))add(2,"Complete the survey details (cooperative, project/area, surveyor) on the Overview tab.");
- if(!hasGps(S.master))add(1,"Record the master station name and GPS location so it appears on the report map.");
- if(!r.length)add(2,"No outstanding actions. Survey data is complete.");
- return r.sort((x,y)=>x.p-y.p)}
-function nextStep(a){
- if(!a.nS)return"Start by adding the substations to be surveyed, capture each GPS location, then record the equipment inside each one.";
- if(!a.nE)return"Add the equipment inventory for each substation, starting with transformers, breakers and protection relays.";
- const g=[];
- if(a.pct<70)g.push(`complete the missing nameplate and site details (survey is ${a.pct}% complete)`);
- if(a.gpsN<a.nS)g.push(`capture GPS for the ${a.nS-a.gpsN} remaining substation(s)`);
- if(a.phN<a.nE)g.push(`photograph the ${a.nE-a.phN} undocumented equipment record(s)`);
- const top=a.per.filter(p=>p.crit>0).sort((x,y)=>y.crit-x.crit)[0],tn=top?subName(top.s):"the substation with the most critical assets";
- if(g.length)return`Close the documentation gaps first: ${g.join("; ")}. Then run a connectivity assessment on the switching and protection assets, starting at ${tn}.`;
- if(a.scL==="Low"||a.scL==="Medium")return`Documentation is in good shape. Run a communications assessment and plan a gateway installation at ${tn} to lift SCADA readiness (currently ${a.scL}).`;
- return`Documentation is complete and the assets are largely remote-ready. Proceed to SCADA integration design with a pilot at ${tn}.`}
-
 /* ---------- Views ---------- */
 function eqCard(si,ei){const s=S.subs[si],r=s.equipment[ei],c=TY(r.type),k="e"+r.id,dk="d"+r.id,dl="mk"+r.id;
  const inp=(l,f,ph)=>`<div><div class="lb">${l}</div><input type="text" placeholder="${ph}" value="${esc(r[f])}" oninput="eqP(${si},${ei},'${f}',this.value)"></div>`;
- return`<details class="ecard eq" ${S.op[k]?"open":""} ontoggle="S.op['${k}']=this.open"><summary><div class="eh"><div class="ename" id="en_${r.id}">${esc(eqTitle(s,ei))}</div><div class="smeta" id="em_${r.id}">${esc(eqMeta(r))}</div></div>${hasPh(r)?`<img class="th" alt="" src="${r.photo}">`:""}</summary>
+ return`<details class="ecard eq" ${S.op[k]?"open":""} ontoggle="S.op['${k}']=this.open"><summary><div class="eh"><div class="ename" id="en_${r.id}">${esc(eqTitle(s,ei))}</div><div class="smeta" id="em_${r.id}">${esc(eqMeta(r))}</div></div>${hasPh(r)?`<span class="phn">${PU[r.photos[0].id]?`<img class="th" alt="" src="${PU[r.photos[0].id]}">`:""}<b>📷 ${phCount(r)}</b></span>`:""}</summary>
 <div class="g2"><div><div class="lb">Equipment Type</div><select onchange="setType(${si},${ei},this.value)">${TYPES.map(t=>`<option ${t.n===r.type?"selected":""}>${t.n}</option>`).join("")}</select></div>
 ${r.type==="Other"?inp("Specify type (optional)","typeOther","e.g. Voltage regulator"):inp("Tag / Name (optional)","tag","e.g. TR-1")}</div>
 ${r.type==="Other"?inp("Tag / Name (optional)","tag","e.g. UNIT-1"):""}
@@ -360,19 +432,22 @@ ${r.type==="Other"?inp("Tag / Name (optional)","tag","e.g. UNIT-1"):""}
 <div class="lb">Remarks</div><textarea rows="2" placeholder="Notes, condition, access, etc." oninput="eqP(${si},${ei},'remarks',this.value)">${esc(r.remarks)}</textarea>
 <div class="lb">Communication interface</div>${c.p.map((o,j)=>chip(esc(o),r.proto.includes(o),`eqProto(${si},${ei},${j})`)).join("")}
 <div class="lb">Condition</div>${CONDS.map(o=>chip(o,r.cond===o,`eqCond(${si},${ei},'${o}')`)).join("")}
-<div class="lb">Equipment Photo</div>
-<div class="pbtns"><label class="chip cta">📷 Take Photo<input class="fi" type="file" accept="image/*" capture="environment" onchange="photoIn(${si},${ei},this)"></label><label class="chip">🖼️ Upload Photo<input class="fi" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" onchange="photoIn(${si},${ei},this)"></label>${hasPh(r)?chip(CF===dk+"p"?"Tap again to remove":"Remove photo",0,`ask('${dk}p',()=>photoDel(${si},${ei}))`):""}</div>
-${hasPh(r)?`<img class="pv" alt="Equipment photo" src="${r.photo}">`:`<div class="pv0">No photo yet. Take or upload one (JPG, PNG, WEBP).</div>`}
+<div class="lb">Equipment Photos (${phCount(r)} of ${MAXP})</div>
+<div class="pbtns">${phCount(r)<MAXP?`<label class="chip cta">📷 Take Photo<input class="fi" type="file" accept="image/*" capture="environment" onchange="photosIn(${si},${ei},this)"></label><label class="chip">🖼️ Upload Photos<input class="fi" type="file" accept="image/*" multiple onchange="photosIn(${si},${ei},this)"></label>`:`<span class="desc">Maximum of ${MAXP} photos reached. Replace or remove one to add another.</span>`}</div>
+${phCount(r)?`<div class="phg">${r.photos.map((p,pi)=>phSlot(si,ei,pi,p,dk)).join("")}</div>`:`<div class="pv0">No photo yet. Add at least 1 photo (up to ${MAXP}) using your camera or gallery. JPEG, HEIC and PNG are supported.</div>`}
 <div style="margin-top:12px;text-align:right"><button class="btn ${CF===dk?"danger":""}" onclick="ask('${dk}',()=>{S.subs[${si}].equipment.splice(${ei},1);T(${si})})">${CF===dk?"Tap again to delete":"Delete equipment"}</button></div></details>`}
 function subCard(si){const s=S.subs[si],k="s"+s.id,n=s.equipment.length,st=GST[s.id],dk="s"+s.id;
  const picker=s.pick?`<div class="picker"><div class="desc">Choose the equipment type to add to this substation:</div>${TYPES.map(t=>chip("+ "+t.n,0,`addEq(${si},'${t.n}')`)).join("")}</div>`:"";
  const stH=st?`<p class="desc ${st.t=="ok"?"good":st.t=="err"?"bad":""}" style="font-weight:${st.t=="ok"?700:400}">${st.t=="ok"?"✔ ":""}${esc(st.m)}</p>`:"";
  return`<details class="card sub" ${S.op[k]?"open":""} ontoggle="S.op['${k}']=this.open"><summary><div class="sh"><div class="sname"><span id="sn_${s.id}">${esc(subName(s))}</span><span class="scode" id="sc_${s.id}" ${val(s.code)?"":'style="display:none"'}>${esc(val(s.code))}</span></div><div class="smeta"><span id="sg_${s.id}">${gpsLine(s)}</span> · Equipment: <span id="sq_${s.id}">${n}</span></div></div><button class="chip cta addq" onclick="event.preventDefault();event.stopPropagation();quickAdd(${si})">${s.pick?"Cancel":"+ Add Equipment"}</button></summary>
 <div class="lb">Substation Name *</div><input type="text" placeholder="e.g. Main 69kV Substation" value="${esc(s.name)}" oninput="setSub(${si},'name',this.value)">
-<div class="g2"><div><div class="lb">Substation Code</div><input type="text" placeholder="e.g. SS-01" value="${esc(s.code)}" oninput="setSub(${si},'code',this.value)"></div><div><div class="lb">Address</div><input type="text" placeholder="Street / barangay / town" value="${esc(s.address)}" oninput="setSub(${si},'address',this.value)"></div></div>
+<div class="g2"><div><div class="lb">Substation Code</div><input type="text" placeholder="e.g. SS-01" value="${esc(s.code)}" oninput="setSub(${si},'code',this.value)"></div><div><div class="lb">Address (street / landmark)</div><input type="text" placeholder="Street / purok / landmark" value="${esc(s.address)}" oninput="setSub(${si},'address',this.value)"></div></div>
+<div class="g3"><div><div class="lb">Barangay</div><input type="text" placeholder="e.g. Brgy. Poblacion" value="${esc(s.barangay)}" oninput="setSub(${si},'barangay',this.value)"></div><div><div class="lb">Town / City</div><input type="text" placeholder="e.g. Majayjay" value="${esc(s.town)}" oninput="setSub(${si},'town',this.value)"></div><div><div class="lb">Province</div><input type="text" placeholder="e.g. Laguna" value="${esc(s.province)}" oninput="setSub(${si},'province',this.value)"></div></div>
+<div class="lb">Substation capacity &amp; feeders</div>
+<div class="g3"><div><div class="desc">Substation Rating</div><input type="text" placeholder="e.g. 10 MVA, 69/13.8 kV" value="${esc(s.rating)}" oninput="setSub(${si},'rating',this.value)"></div><div><div class="desc">Incoming Feeders</div><input type="text" inputmode="numeric" pattern="[0-9]*" placeholder="No." value="${esc(s.feedIn)}" oninput="numIn(this);setSub(${si},'feedIn',this.value)"></div><div><div class="desc">Outgoing Feeders</div><input type="text" inputmode="numeric" pattern="[0-9]*" placeholder="No." value="${esc(s.feedOut)}" oninput="numIn(this);setSub(${si},'feedOut',this.value)"></div></div>
 <div class="lb">GPS location</div>
 <div class="g3"><div><div class="desc">Latitude</div><input type="text" inputmode="decimal" placeholder="Latitude" value="${esc(s.lat)}" oninput="setSub(${si},'lat',this.value)"></div><div><div class="desc">Longitude</div><input type="text" inputmode="decimal" placeholder="Longitude" value="${esc(s.lng)}" oninput="setSub(${si},'lng',this.value)"></div><div><div class="desc">GPS Accuracy (m)</div><input type="text" inputmode="decimal" id="acc_${s.id}" placeholder="Auto" value="${esc(s.acc)}" oninput="S.subs[${si}].acc=this.value;T(${si})"></div></div>
-<div style="margin-top:10px"><button class="chip cta" onclick="gps(${si})">📍 Capture Current Location</button>${hasGps(s)?`<button class="chip" onclick="clearGps(${si})">Clear</button><a class="chip" href="${mapLink(s)}" target="_blank" rel="noopener" style="text-decoration:none;color:var(--tx)">Open in Maps</a>`:""}</div>${stH}
+<div style="margin-top:10px"><button class="chip cta" onclick="gps(${si})">📍 Capture Current Location</button>${hasGps(s)?`<button class="chip" onclick="autoAddr('${s.id}',true)">🏠 Auto-fill Address</button><button class="chip" onclick="clearGps(${si})">Clear</button><a class="chip" href="${mapLink(s)}" target="_blank" rel="noopener" style="text-decoration:none;color:var(--tx)">Open in Maps</a>`:""}</div>${stH}${astBox(s.id)}
 <div class="lb" style="margin-top:16px">Equipment (${n})</div>${picker}
 ${n?s.equipment.map((r,ei)=>eqCard(si,ei)).join(""):`<p class="desc">No equipment yet. Tap <b>+ Add Equipment</b>.</p>`}
 <div style="margin-top:14px;text-align:right"><button class="btn ${CF===dk?"danger":""}" onclick="ask('${dk}',()=>{S.subs.splice(${si},1)})">${CF===dk?`Tap again to delete this substation and its ${n} equipment`:"Delete substation"}</button></div></details>`}
@@ -383,10 +458,37 @@ function masterCard(){const m=S.master,st=GST.master;
  const stH=st?`<p class="desc ${st.t=="ok"?"good":st.t=="err"?"bad":""}" style="font-weight:${st.t=="ok"?700:400}">${st.t=="ok"?"✔ ":""}${esc(st.m)}</p>`:"";
  return`<div class="card"><h2>Master Station</h2><p class="desc">The SCADA master / control center the substations report to. It is pinned on the Report map.</p>
 <div class="lb">Master Station Name</div><input type="text" placeholder="e.g. Cooperative Control Center" value="${esc(m.name)}" oninput="setMaster('name',this.value)">
-<div class="lb">Address</div><input type="text" placeholder="Street / barangay / town" value="${esc(m.address)}" oninput="setMaster('address',this.value)">
+<div class="lb">Address</div><input type="text" placeholder="Street / purok / landmark" value="${esc(m.address)}" oninput="setMaster('address',this.value)">
+<div class="g3"><div><div class="lb">Barangay</div><input type="text" placeholder="e.g. Brgy. Poblacion" value="${esc(m.barangay)}" oninput="setMaster('barangay',this.value)"></div><div><div class="lb">Town / City</div><input type="text" placeholder="e.g. Majayjay" value="${esc(m.town)}" oninput="setMaster('town',this.value)"></div><div><div class="lb">Province</div><input type="text" placeholder="e.g. Laguna" value="${esc(m.province)}" oninput="setMaster('province',this.value)"></div></div>
 <div class="lb">GPS location</div>
 <div class="g3"><div><div class="desc">Latitude</div><input type="text" inputmode="decimal" placeholder="Latitude" value="${esc(m.lat)}" oninput="setMaster('lat',this.value)"></div><div><div class="desc">Longitude</div><input type="text" inputmode="decimal" placeholder="Longitude" value="${esc(m.lng)}" oninput="setMaster('lng',this.value)"></div><div><div class="desc">GPS Accuracy (m)</div><input type="text" inputmode="decimal" id="acc_master" placeholder="Auto" value="${esc(m.acc)}" oninput="setMaster('acc',this.value)"></div></div>
-<div style="margin-top:10px"><button class="chip cta" onclick="gpsId('master')">📍 Capture Current Location</button>${hasGps(m)?`<button class="chip" onclick="clearMaster()">Clear</button><a class="chip" href="${mapLink(m)}" target="_blank" rel="noopener" style="text-decoration:none;color:var(--tx)">Open in Maps</a>`:""}</div>${stH}</div>`}
+<div style="margin-top:10px"><button class="chip cta" onclick="gpsId('master')">📍 Capture Current Location</button>${hasGps(m)?`<button class="chip" onclick="autoAddr('master',true)">🏠 Auto-fill Address</button><button class="chip" onclick="clearMaster()">Clear</button><a class="chip" href="${mapLink(m)}" target="_blank" rel="noopener" style="text-decoration:none;color:var(--tx)">Open in Maps</a>`:""}</div>${stH}${astBox("master")}</div>`}
+
+/* ---------- Address from GPS (reverse geocoding, OpenStreetMap Nominatim, no key) ---------- */
+const AST={};
+const astBox=id=>{const t=AST[id];return t?`<p class="desc ${t.t=="ok"?"good":t.t=="err"?"bad":""}">${esc(t.m)}</p>`:""};
+const REGION=/region|calabarzon|mimaropa|bicol|visayas|luzon|mindanao|soccsksargen|caraga|barmm|\bncr\b|metro manila/i;
+async function revGeo(o){
+ const u="https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&zoom=18&accept-language=en&lat="+encodeURIComponent(val(o.lat))+"&lon="+encodeURIComponent(val(o.lng));
+ const c=new AbortController(),t=setTimeout(()=>c.abort(),12000);
+ try{const r=await fetch(u,{signal:c.signal,headers:{Accept:"application/json"}});if(!r.ok)throw new Error("HTTP "+r.status);return await r.json()}finally{clearTimeout(t)}}
+function parseAddr(j){const a=(j&&j.address)||{};
+ const street=[a.house_number,a.road].filter(Boolean).join(" ");
+ let b=a.suburb||a.village||a.neighbourhood||a.quarter||a.hamlet||a.city_district||"";
+ if(b&&!/^(brgy|barangay)/i.test(b))b="Brgy. "+b;
+ const town=a.city||a.town||a.municipality||"";
+ const c=[a.province,a.county,a.state_district,a.state,a.region].filter(Boolean),prov=c.find(x=>!REGION.test(x))||c[0]||"";
+ return{street,barangay:b,town,province:prov}}
+async function autoAddr(id,force){
+ const get=()=>id==="master"?S.master:S.subs.find(x=>x.id===id),o=get();if(!o)return;
+ if(!hasGps(o)){AST[id]={t:"err",m:"Capture or enter the GPS location first."};R();return}
+ AST[id]={t:"busy",m:"Looking up the address from GPS..."};R();
+ try{const j=await revGeo(o),p=parseAddr(j),t=get();if(!t)return;
+  if(!p.street&&!p.barangay&&!p.town&&!p.province){AST[id]={t:"err",m:"No address was found for this location. Please type it manually."};R();return}
+  [["address",p.street],["barangay",p.barangay],["town",p.town],["province",p.province]].forEach(([f,v])=>{if(v&&(force||!val(t[f])))t[f]=v});
+  if(id!=="master")t.updated=Date.now();
+  AST[id]={t:"ok",m:"Address detected from GPS: "+(fullAddr(t)||"-")+". Please verify, because map data for some barangays may be incomplete."};saveNow();R()}
+ catch(e){AST[id]={t:"err",m:"Could not look up the address (internet connection needed). Please type it manually."};R()}}
 
 /* ---------- Report map (Leaflet + OpenStreetMap, no API key) ---------- */
 let MAP=null;
@@ -410,6 +512,16 @@ function initMap(){
    .bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.sub)}<br>${esc(gpsTxt(p.o))}<br><a href="${mapLink(p.o)}" target="_blank" rel="noopener">Open in Google Maps</a>`)});
  ll.length==1?MAP.setView(ll[0],16):MAP.fitBounds(ll,{padding:[40,40],maxZoom:17})}
 
+/* ---------- Personnel who assisted the survey ---------- */
+function addPerson(){S.info.assist.push({name:"",role:""});saveNow();R()}
+function setPerson(i,f,v){S.info.assist[i][f]=v;save()}
+function delPerson(i){S.info.assist.splice(i,1);saveNow();R()}
+function assistCard(){const L=S.info.assist;
+ return`<div class="card assist"><h2>👷 Engineers &amp; Personnel Who Assisted the Survey</h2><p class="desc">List everyone who accommodated or assisted during the site survey assessment. The names appear in the final report.</p>
+${L.map((p,i)=>`<div class="arow"><div class="anum">${i+1}</div><div class="afl"><input type="text" placeholder="Full name" value="${esc(p.name)}" oninput="setPerson(${i},'name',this.value)"><input type="text" placeholder="Position / Department (optional)" value="${esc(p.role)}" oninput="setPerson(${i},'role',this.value)"></div><button class="chip" aria-label="Remove person" onclick="delPerson(${i})">✕</button></div>`).join("")}
+${L.length?"":`<p class="desc">No names added yet.</p>`}
+<button class="chip cta" onclick="addPerson()">+ Add Person</button></div>`}
+
 const tbl=(h,rows,w)=>`<div class="tw"><table class="sm"><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`;
 const kv=rows=>`<table class="sm kv">${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join("")}</table>`;
 const bar=p=>`<div class="bar"><i style="width:${p}%"></i></div>`;
@@ -418,21 +530,20 @@ const sec=(n,t,b,pb)=>`<div class="card sec ${pb?"pb":""}"><h2>${n}. ${t}</h2>${
 function view(){
  const a=A();
  if(S.tab==="Overview"){const F=[["client","Electric Cooperative / Client"],["site","Project / Area"],["who","Surveyor(s)"]];
-  let used="";try{const l=(localStorage.getItem(KEY)||"").length*2;used=`Storage used: ${(l/1048576).toFixed(1)} MB of about 5 MB (photos are the largest part).`}catch(e){}
   return`<div class="card"><div class="lb">Survey date</div><input type="date" value="${esc(S.info.date)}" onchange="S.info.date=this.value;save()">${F.map(([k,l])=>`<div class="lb">${l}</div><input type="text" value="${esc(S.info[k])}" oninput="S.info['${k}']=this.value;save()">`).join("")}</div>
+${assistCard()}
 ${masterCard()}
-<div class="card"><h2>Dashboard</h2><div class="stats"><div class="stat"><b>${a.nS}</b>Total Substations</div><div class="stat"><b>${a.nE}</b>Total Equipment</div><div class="stat"><b>${a.gpsN}/${a.nS}</b>GPS Captured</div><div class="stat"><b>${a.phN}/${a.nE}</b>Equipment Photos</div></div>${a.nS?`<div class="lb">Substations</div>${S.subs.map((s,i)=>`<button class="subrow" onclick="S.tab='Equipment';S.op['s${s.id}']=true;saveNow();R();window.scrollTo(0,0)"><span>📍 ${esc(subName(s))}<br><span class="smeta">${gpsLine(s)}</span></span><span class="cnt">${s.equipment.length} Equipment</span></button>`).join("")}`:`<p class="desc">No substations yet. Open the Equipment tab and tap + Add Substation.</p>`}</div>
-<div class="card"><b>Survey completion: ${a.pct}%</b>${bar(a.pct)}<p class="desc">Based on survey details, substation fields (name, code, address, GPS) and equipment fields (manufacturer, model, serial, rating, photo).</p><p class="desc">${used}</p></div>`}
+<div class="card"><h2>Dashboard</h2><div class="stats"><div class="stat"><b>${a.nS}</b>Total Substations</div><div class="stat"><b>${a.nE}</b>Total Equipment</div><div class="stat"><b>${a.gpsN}/${a.nS}</b>GPS Captured</div><div class="stat"><b>${a.photoTotal}</b>Photos Captured</div></div>${a.nS?`<div class="lb">Substations</div>${S.subs.map((s,i)=>`<button class="subrow" onclick="S.tab='Equipment';S.op['s${s.id}']=true;saveNow();R();window.scrollTo(0,0)"><span>📍 ${esc(subName(s))}<br><span class="smeta">${gpsLine(s)}${val(s.rating)?" · Rating: "+esc(val(s.rating)):""} · Feeders: ${esc(feedTxt(s))}</span></span><span class="cnt">${s.equipment.length} Equipment</span></button>`).join("")}`:`<p class="desc">No substations yet. Open the Equipment tab and tap + Add Substation.</p>`}</div>
+${SINFO?`<div class="card"><p class="desc">${esc(SINFO)}</p></div>`:""}`}
  if(S.tab==="Equipment")return`<div class="card"><h2>Substations</h2><div style="margin-top:10px"><button class="chip cta" onclick="addSub()">+ Add Substation</button><button class="chip" onclick="csv()">Export CSV</button></div></div>`+(S.subs.length?S.subs.map((s,i)=>subCard(i)).join(""):`<div class="card"><p class="desc">No substations yet. Tap <b>+ Add Substation</b> to begin.</p></div>`);
  return rep(a)}
 
 function rep(a){
- const I=S.info,cl=val(I.client)||"Power Distribution Survey",obs=observations(a),rc=recs(a);
- const PL=["High","Medium","Low"],pcl=["bad","warn","good"];
- const cover=`<div class="card cover">${LOGO?`<img class="clogo" alt="Controtek" src="${LOGO}">`:""}<div class="ctitle">Power Distribution Site Survey</div><div class="csub">${esc(cl)}</div>${kv([["Project / Area",esc(val(I.site)||"—")],["Survey date",esc(val(I.date)||"—")],["Surveyor(s)",esc(val(I.who)||"—")]])}</div>`;
- const prose=`This survey covers ${nm(a.nS,"substation")} and ${nm(a.nE,"equipment record")}. Survey completion is ${a.pct}%, GPS locations are captured for ${a.gpsN} of ${a.nS} substations and photos exist for ${a.phN} of ${a.nE} assets. Data collection readiness is ${a.dcL}, SCADA integration readiness is ${a.scL} and meter integration readiness is ${a.mtL}.`;
- const exec=sec(1,"Executive Summary",`<p>${prose}</p>`+kv([["Electric Cooperative",esc(cl)],["Number of Substations",a.nS],["Total Equipment",a.nE],["Survey Completion",`${a.pct}%${bar(a.pct)}`],["GPS Locations Captured",`${a.gpsN} of ${a.nS}`],["Equipment Photos",`${a.phN} of ${a.nE}`],["Master Station",esc(val(S.master.name)||"Not recorded")+(hasGps(S.master)?" (GPS captured)":"")]]));
- const subSum=sec(2,"Substation Summary",a.nS?tbl(["Substation","Code","Address","GPS","Equipment","Critical","Photos","Complete"],a.per.map(p=>[esc(subName(p.s)),esc(val(p.s.code)),esc(val(p.s.address)),hasGps(p.s)?"✔ Captured":"✖ Missing",p.n,p.crit,`${p.ph}/${p.n}`,p.pct+"%"])):"<p>No substations recorded.</p>");
+ const I=S.info,cl=val(I.client)||"Power Distribution Survey",obs=observations(a),pe=assistList();
+ const cover=`<div class="card cover">${LOGO?`<img class="clogo" alt="Controtek" src="${LOGO}">`:""}<div class="ctitle">Power Distribution Site Survey</div><div class="csub">${esc(cl)}</div>${kv([["Project / Area",esc(val(I.site)||"—")],["Survey date",esc(val(I.date)||"—")],["Surveyor(s)",esc(val(I.who)||"—")],["Assisted by",esc(pe.length?pe.map(p=>p.name.trim()).join("; "):"—")]])}</div>`;
+ const prose=`This survey covers ${nm(a.nS,"substation")} (${nm(a.feedInT,"incoming feeder")} and ${nm(a.feedOutT,"outgoing feeder")} recorded) and ${nm(a.nE,"equipment record")} with ${nm(a.photoTotal,"photo")}. GPS locations are captured for ${a.gpsN} of ${a.nS} substations. Data collection readiness is ${a.dcL}, SCADA integration readiness is ${a.scL} and meter integration readiness is ${a.mtL}.`;
+ const exec=sec(1,"Executive Summary",`<p>${prose}</p>`+kv([["Electric Cooperative",esc(cl)],["Number of Substations",a.nS],["Total Equipment",a.nE],["Total Incoming Feeders",a.feedInT],["Total Outgoing Feeders",a.feedOutT],["GPS Locations Captured",`${a.gpsN} of ${a.nS}`],["Equipment Photos",`${a.photoTotal} photos (${a.phN} of ${a.nE} equipment documented)`],["Master Station",esc(val(S.master.name)||"Not recorded")+(hasGps(S.master)?" (GPS captured)":"")]])+`<div class="lb"><b>Engineers &amp; Personnel Who Assisted the Survey</b></div>`+(pe.length?tbl(["#","Name","Position / Department"],pe.map((p,i)=>[i+1,esc(val(p.name)),esc(val(p.role)||"—")])):"<p>None recorded.</p>"));
+ const subSum=sec(2,"Substation Summary",a.nS?tbl(["Substation","Code","Address","Rating","Incoming Feeders","Outgoing Feeders","GPS","Equipment","Photos"],a.per.map(p=>[esc(subName(p.s)),esc(val(p.s.code)),esc(fullAddr(p.s)),esc(val(p.s.rating)||"—"),esc(val(p.s.feedIn)||"—"),esc(val(p.s.feedOut)||"—"),hasGps(p.s)?"✔ Captured":"✖ Missing",p.n,p.pc])):"<p>No substations recorded.</p>");
  const brk=TYPES.filter(t=>a.cnt[t.n]).map(t=>[t.pl,a.cnt[t.n]]);
  const rd=(t,l,why)=>`<tr><th>${t}</th><td><span class="rd rd-${rdc(l)}">${l}</span></td><td>${why}</td></tr>`;
  const w=(arr)=>`${arr.filter(x=>cs(x.e)>=1).length} remote-ready, ${arr.filter(x=>cs(x.e)==0.5).length} basic (Standard I/O only), ${arr.filter(x=>cs(x.e)==0).length} none or unrecorded`;
@@ -441,16 +552,14 @@ function rep(a){
 <div class="lb"><b>Digitization Readiness</b></div><table class="sm kv rdt"><tr><th>Area</th><th>Level</th><th>Basis</th></tr>
 ${rd("SCADA Integration Readiness",a.scL,a.scArr.length?`${a.scArr.length} switching / protection assets: ${w(a.scArr)}.`:"No transformers, breakers, reclosers, sectionalizers or relays recorded.")}
 ${rd("Meter Integration Readiness",a.mtL,a.mtArr.length?`${a.mtArr.length} revenue meters: ${w(a.mtArr)}.`:"No revenue meters recorded.")}
-${rd("Data Collection Readiness",a.dcL,a.nS?`Survey ${a.pct}% complete, GPS ${Math.round(a.gpsN/a.nS*100)}%, photos ${a.nE?Math.round(a.phN/a.nE*100):0}%.`:"No substations recorded.")}</table>
-<p><b>Recommended Next Step:</b> ${esc(nextStep(a))}</p>`,1);
- const inv=sec(4,"Equipment Inventory",a.nS?S.subs.map(s=>`<div class="lb"><b>${esc(subName(s))}${val(s.code)?" ("+esc(val(s.code))+")":""}</b></div>`+(s.equipment.length?tbl(["Equipment","Manufacturer","Model","Serial No.","Rating","Comm.","Cond.","Photo","Remarks"],s.equipment.map((r,i)=>[esc(eqTitle(s,i)),esc(val(r.mf)||"—"),esc(val(r.model)||"—"),esc(val(r.serial)||"—"),esc(val(r.rating)||"—"),esc((r.proto||[]).join(", ")||"—"),r.cond||"—",hasPh(r)?"Yes":"No",esc(val(r.remarks))])):"<p>No equipment recorded.</p>")).join(""):"<p>No substations recorded.</p>",1);
+${rd("Data Collection Readiness",a.dcL,a.nS?`GPS recorded at ${a.gpsN} of ${a.nS} substations; photos for ${a.phN} of ${a.nE} equipment; nameplate data (model, serial, rating) recorded for ${a.np} of ${a.nE}.`:"No substations recorded.")}</table>`,1);
+ const inv=sec(4,"Equipment Inventory",a.nS?S.subs.map(s=>`<div class="lb"><b>${esc(subName(s))}${val(s.code)?" ("+esc(val(s.code))+")":""}</b></div>`+tbl(["Substation Rating","Incoming Feeders","Outgoing Feeders","Address"],[[esc(val(s.rating)||"—"),esc(val(s.feedIn)||"—"),esc(val(s.feedOut)||"—"),esc(fullAddr(s)||"—")]])+(s.equipment.length?tbl(["Equipment","Manufacturer","Model","Serial No.","Rating","Comm.","Cond.","Photos","Remarks"],s.equipment.map((r,i)=>[esc(eqTitle(s,i)),esc(val(r.mf)||"—"),esc(val(r.model)||"—"),esc(val(r.serial)||"—"),esc(val(r.rating)||"—"),esc((r.proto||[]).join(", ")||"—"),r.cond||"—",phCount(r),esc(val(r.remarks))])):"<p>No equipment recorded.</p>")).join(""):"<p>No substations recorded.</p>",1);
  const mp=mapPts(),M=S.master,mrow=(val(M.name)||hasGps(M))?[["★ "+esc(val(M.name)||"Master Station")+" (Master Station)",esc(val(M.lat)||"—"),esc(val(M.lng)||"—"),val(M.acc)?"±"+esc(val(M.acc))+" m":"—",hasGps(M)?`<a href="${mapLink(M)}" target="_blank" rel="noopener">Open map</a>`:"Not captured"]]:[];
  const legend=mp.length?`<div class="maplg">${mp.map(p=>`<span><span class="pin ${p.k=="m"?"m":""}">${p.n}</span>${esc(p.name)}</span>`).join("")}</div>`:"";
  const gp=sec(5,"GPS Coordinates & Site Map",`<div id="rmap" class="mapbox"></div>${legend}`+(a_nS_or_master(a,mrow)?tbl(["Location","Latitude","Longitude","Accuracy","Map"],mrow.concat(S.subs.map(s=>[esc(subName(s)),esc(val(s.lat)||"—"),esc(val(s.lng)||"—"),val(s.acc)?"±"+esc(val(s.acc))+" m":"—",hasGps(s)?`<a href="${mapLink(s)}" target="_blank" rel="noopener">Open map</a>`:"Not captured"]))):"<p>No substations recorded.</p>"));
- const ph=S.subs.map(s=>{const f=s.equipment.map((r,i)=>[r,i]).filter(x=>hasPh(x[0]));return f.length?`<div class="lb"><b>${esc(subName(s))}</b></div><div class="pgrid">${f.map(([r,i])=>`<figure class="pfig"><img alt="" src="${r.photo}"><figcaption><b>${esc(eqTitle(s,i))}</b><br>${esc(eqMeta(r))}${val(r.serial)?" · S/N: "+esc(val(r.serial)):""}</figcaption></figure>`).join("")}</div>`:""}).join("");
+ const ph=S.subs.map(s=>{const f=[];s.equipment.forEach((r,i)=>(r.photos||[]).forEach((p,k)=>f.push({r,i,p,k,n:r.photos.length})));return f.length?`<div class="lb"><b>${esc(subName(s))}</b></div><div class="pgrid">${f.map(({r,i,p,k,n})=>`<figure class="pfig">${PU[p.id]?`<img alt="" src="${PU[p.id]}">`:`<div class="phl" style="height:190px;display:flex;align-items:center;justify-content:center">Loading…</div>`}<figcaption><b>${esc(eqTitle(s,i))}</b> · Photo ${k+1} of ${n}<br>${esc(eqMeta(r))}${val(r.serial)?" · S/N: "+esc(val(r.serial)):""}</figcaption></figure>`).join("")}</div>`:""}).join("");
  const photos=sec(6,"Equipment Photos",ph||"<p>No equipment photos captured yet.</p>",1);
- const recS=sec(7,"Recommendations",`<ol class="recs">${rc.map(x=>`<li><span class="pri ${pcl[x.p]}">${PL[x.p]}</span> ${esc(x.t)}</li>`).join("")}</ol>`);
- return cover+exec+subSum+analysis+inv+gp+photos+recS+`<div class="card noprint"><button class="btn primary" onclick="savePdf()">Save as PDF</button> <button class="btn" onclick="window.print()">Print</button> <button class="btn" onclick="csv()">Export CSV</button> <button class="btn" onclick="exp()">Export backup</button><p class="desc">Tip: <b>Save as PDF</b> builds a real PDF file you can save to Files, share or email (works on iPad, iPhone and desktop). The map needs an internet connection.</p></div>`}
+ return cover+exec+subSum+analysis+inv+gp+photos+`<div class="card noprint"><button class="btn primary" onclick="savePdf()">Save as PDF</button> <button class="btn" onclick="window.print()">Print</button> <button class="btn" onclick="csv()">Export CSV</button> <button class="btn" onclick="exp()">Export backup</button><p class="desc">Tip: <b>Save as PDF</b> builds a real PDF file you can save to Files, share or email (works on iPad, iPhone and desktop). The map needs an internet connection.</p></div>`}
 
 /* ---------- PDF export (jsPDF + autoTable; works on iPad / iPhone / desktop) ---------- */
 const PTX=s=>String(s??"").replace(/[\u2013\u2014]/g,"-").replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/\u2022/g,"-").replace(/[★✔✖]/g,"").replace(/[^\x09\x0A\x20-\x7E\xA0-\xFF]/g,"?").trim();
@@ -478,14 +587,14 @@ async function mapImage(pts){
 
 async function buildPdf(){
  const {jsPDF}=window.jspdf,doc=new jsPDF({unit:"pt",format:"letter",compress:true}),PW_=doc.internal.pageSize.getWidth(),PH=doc.internal.pageSize.getHeight(),M=40,CW=PW_-2*M;
- const a=A(),I=S.info,cl=val(I.client)||"Power Distribution Survey",obs=observations(a),rc=recs(a),PL=["High","Medium","Low"];
+ const a=A(),I=S.info,cl=val(I.client)||"Power Distribution Survey",obs=observations(a),pe=assistList();
  const hd=document.querySelector(".phd"),ft=document.querySelector(".pft");
  const hs=hd?await imgSize(hd.src):null,fz=ft?await imgSize(ft.src):null;
  const hH=hs?PW_*hs.h/hs.w:0,fH=fz?PW_*fz.h/fz.w:0,top=hH+18,bot=PH-fH-22;
  let y=top;
  const np=()=>{doc.addPage();y=top},need=h=>{if(y+h>bot)np()};
- const H2=t=>{y+=12;need(60);doc.setFont("helvetica","bold");doc.setFontSize(14);doc.setTextColor(27,32,41);doc.text(PTX(t),M,y+12);doc.setDrawColor(232,48,26);doc.setLineWidth(1.5);doc.line(M,y+18,PW_-M,y+18);y+=34};
- const SUBT=t=>{need(40);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.setTextColor(27,32,41);doc.text(PTX(t),M,y+10);y+=18};
+ const H2=t=>{y+=12;need(130);doc.setFont("helvetica","bold");doc.setFontSize(14);doc.setTextColor(27,32,41);doc.text(PTX(t),M,y+12);doc.setDrawColor(232,48,26);doc.setLineWidth(1.5);doc.line(M,y+18,PW_-M,y+18);y+=34};
+ const SUBT=t=>{need(80);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.setTextColor(27,32,41);doc.text(PTX(t),M,y+10);y+=18};
  const P=(t,o={})=>{const sz=o.sz||10;doc.setFont("helvetica",o.b?"bold":"normal");doc.setFontSize(sz);doc.setTextColor(40,40,40);doc.splitTextToSize(PTX(t),CW-(o.ind||0)).forEach(l=>{need(sz+5);doc.text(l,M+(o.ind||0),y+sz);y+=sz+4});y+=o.gap??4};
  const TB=(head,body,o={})=>{need(60);doc.autoTable({startY:y,head:head?[head]:undefined,body:body.map(r=>r.map(PTX)),theme:"grid",margin:{top:top,bottom:fH+30,left:o.ml||M,right:o.mr||M},styles:{fontSize:o.fs||8.5,cellPadding:4,overflow:"linebreak",lineColor:[200,205,214],lineWidth:0.5,textColor:[30,30,30]},headStyles:{fillColor:[232,48,26],textColor:255,fontStyle:"bold"},columnStyles:o.cs||{}});y=doc.lastAutoTable.finalY+12};
  const KV=(rows,o={})=>TB(null,rows,Object.assign({cs:{0:{fontStyle:"bold",fillColor:[241,243,246],cellWidth:o.kw||170}}},o));
@@ -495,17 +604,19 @@ async function buildPdf(){
  doc.setFont("helvetica","bold");doc.setFontSize(28);doc.setTextColor(27,32,41);doc.text("Power Distribution",PW_/2,top+190,{align:"center"});doc.text("Site Survey",PW_/2,top+224,{align:"center"});
  doc.setDrawColor(232,48,26);doc.setLineWidth(2.5);doc.line(PW_/2-50,top+240,PW_/2+50,top+240);
  doc.setFont("helvetica","normal");doc.setFontSize(16);doc.setTextColor(95,107,124);doc.text(PTX(cl),PW_/2,top+270,{align:"center"});
- y=top+295;KV([["Project / Area",val(I.site)||"-"],["Survey date",val(I.date)||"-"],["Surveyor(s)",val(I.who)||"-"],["Master Station",val(S.master.name)||"-"]],{ml:120,mr:120,fs:10,kw:110});
+ y=top+295;KV([["Project / Area",val(I.site)||"-"],["Survey date",val(I.date)||"-"],["Surveyor(s)",val(I.who)||"-"],["Assisted by",pe.length?pe.map(p=>p.name.trim()).join("; "):"-"],["Master Station",val(S.master.name)||"-"]],{ml:120,mr:120,fs:10,kw:110});
  np();
 
  /* 1. Executive summary */
  H2("1. Executive Summary");
- P(`This survey covers ${nm(a.nS,"substation")} and ${nm(a.nE,"equipment record")}. Survey completion is ${a.pct}%, GPS locations are captured for ${a.gpsN} of ${a.nS} substations and photos exist for ${a.phN} of ${a.nE} assets. Data collection readiness is ${a.dcL}, SCADA integration readiness is ${a.scL} and meter integration readiness is ${a.mtL}.`,{gap:8});
- KV([["Electric Cooperative",cl],["Number of Substations",String(a.nS)],["Total Equipment",String(a.nE)],["Survey Completion",a.pct+"%"],["GPS Locations Captured",`${a.gpsN} of ${a.nS}`],["Equipment Photos",`${a.phN} of ${a.nE}`],["Master Station",(val(S.master.name)||"Not recorded")+(hasGps(S.master)?" (GPS captured)":"")]]);
+ P(`This survey covers ${nm(a.nS,"substation")} (${nm(a.feedInT,"incoming feeder")} and ${nm(a.feedOutT,"outgoing feeder")} recorded) and ${nm(a.nE,"equipment record")} with ${nm(a.photoTotal,"photo")}. GPS locations are captured for ${a.gpsN} of ${a.nS} substations. Data collection readiness is ${a.dcL}, SCADA integration readiness is ${a.scL} and meter integration readiness is ${a.mtL}.`,{gap:8});
+ KV([["Electric Cooperative",cl],["Number of Substations",String(a.nS)],["Total Equipment",String(a.nE)],["Total Incoming Feeders",String(a.feedInT)],["Total Outgoing Feeders",String(a.feedOutT)],["GPS Locations Captured",`${a.gpsN} of ${a.nS}`],["Equipment Photos",`${a.photoTotal} photos (${a.phN} of ${a.nE} equipment documented)`],["Master Station",(val(S.master.name)||"Not recorded")+(hasGps(S.master)?" (GPS captured)":"")]]);
+ SUBT("Engineers & Personnel Who Assisted the Survey");
+ pe.length?TB(["#","Name","Position / Department"],pe.map((p,i)=>[String(i+1),val(p.name),val(p.role)||"-"]),{cs:{0:{cellWidth:30}}}):P("None recorded.");
 
  /* 2. Substation summary */
  H2("2. Substation Summary");
- a.nS?TB(["Substation","Code","Address","GPS","Equip.","Critical","Photos","Complete"],a.per.map(p=>[subName(p.s),val(p.s.code),val(p.s.address),hasGps(p.s)?"Yes":"Missing",String(p.n),String(p.crit),`${p.ph}/${p.n}`,p.pct+"%"])):P("No substations recorded.");
+ a.nS?TB(["Substation","Code","Address","Rating","Incoming Feeders","Outgoing Feeders","GPS","Equip.","Photos"],a.per.map(p=>[subName(p.s),val(p.s.code),fullAddr(p.s),val(p.s.rating)||"-",val(p.s.feedIn)||"-",val(p.s.feedOut)||"-",hasGps(p.s)?"Yes":"Missing",String(p.n),String(p.pc)]),{fs:7.5}):P("No substations recorded.");
 
  /* 3. Analysis */
  H2("3. Site Survey Analysis");
@@ -518,14 +629,14 @@ async function buildPdf(){
  TB(["Area","Level","Basis"],[
   ["SCADA Integration Readiness",a.scL,a.scArr.length?`${a.scArr.length} switching / protection assets: ${w(a.scArr)}.`:"No transformers, breakers, reclosers, sectionalizers or relays recorded."],
   ["Meter Integration Readiness",a.mtL,a.mtArr.length?`${a.mtArr.length} revenue meters: ${w(a.mtArr)}.`:"No revenue meters recorded."],
-  ["Data Collection Readiness",a.dcL,a.nS?`Survey ${a.pct}% complete, GPS ${Math.round(a.gpsN/a.nS*100)}%, photos ${a.nE?Math.round(a.phN/a.nE*100):0}%.`:"No substations recorded."]],{cs:{0:{fontStyle:"bold",cellWidth:140},1:{cellWidth:70,fontStyle:"bold"}}});
- P("Recommended Next Step: "+nextStep(a),{b:1,sz:10});
+  ["Data Collection Readiness",a.dcL,a.nS?`GPS recorded at ${a.gpsN} of ${a.nS} substations; photos for ${a.phN} of ${a.nE} equipment; nameplate data recorded for ${a.np} of ${a.nE}.`:"No substations recorded."]],{cs:{0:{fontStyle:"bold",cellWidth:140},1:{cellWidth:70,fontStyle:"bold"}}});
 
  /* 4. Inventory */
  H2("4. Equipment Inventory");
  if(!a.nS)P("No substations recorded.");
  S.subs.forEach(s=>{SUBT(subName(s)+(val(s.code)?" ("+val(s.code)+")":""));
-  s.equipment.length?TB(["Equipment","Manufacturer","Model","Serial No.","Rating","Comm.","Cond.","Photo","Remarks"],s.equipment.map((r,i)=>[eqTitle(s,i),val(r.mf)||"-",val(r.model)||"-",val(r.serial)||"-",val(r.rating)||"-",(r.proto||[]).join(", ")||"-",r.cond||"-",hasPh(r)?"Yes":"No",val(r.remarks)]),{fs:7.5}):P("No equipment recorded.")});
+  TB(["Substation Rating","Incoming Feeders","Outgoing Feeders","Address"],[[val(s.rating)||"-",val(s.feedIn)||"-",val(s.feedOut)||"-",fullAddr(s)||"-"]],{fs:8});
+  s.equipment.length?TB(["Equipment","Manufacturer","Model","Serial No.","Rating","Comm.","Cond.","Photos","Remarks"],s.equipment.map((r,i)=>[eqTitle(s,i),val(r.mf)||"-",val(r.model)||"-",val(r.serial)||"-",val(r.rating)||"-",(r.proto||[]).join(", ")||"-",r.cond||"-",String(phCount(r)),val(r.remarks)]),{fs:7.5}):P("No equipment recorded.")});
 
  /* 5. GPS + map */
  H2("5. GPS Coordinates & Site Map");
@@ -538,24 +649,24 @@ async function buildPdf(){
  S.subs.forEach(s=>rows.push([subName(s),val(s.lat)||"-",val(s.lng)||"-",val(s.acc)?"+/-"+val(s.acc)+" m":"-",hasGps(s)?"Captured":"Not captured"]));
  rows.length&&TB(["Location","Latitude","Longitude","Accuracy","Status"],rows);
 
- /* 6. Photos */
+ /* 6. Photos (read one at a time from device storage to keep memory low) */
  H2("6. Equipment Photos");
  let any=false;const GW=(CW-14)/2,GH=190;
- for(const s of S.subs){const f=s.equipment.map((r,i)=>[r,i]).filter(x=>hasPh(x[0]));if(!f.length)continue;any=true;SUBT(subName(s));
-  for(let j=0;j<f.length;j++){const [r,i]=f[j],col=j%2;
-   if(col===0){need(GH+52);}
-   const x=M+col*(GW+14),sz=await imgSize(r.photo)||{w:4,h:3},k=Math.min(GW/sz.w,GH/sz.h),w=sz.w*k,h=sz.h*k;
+ for(const s of S.subs){const f=[];s.equipment.forEach((r,i)=>(r.photos||[]).forEach((p,k)=>f.push({r,i,p,k,n:r.photos.length})));if(!f.length)continue;any=true;SUBT(subName(s));
+  for(let j=0;j<f.length;j++){const {r,i,p,k,n}=f[j],col=j%2;
+   if(col===0)need(GH+52);
+   const x=M+col*(GW+14);
    doc.setDrawColor(200,205,214);doc.setLineWidth(.5);doc.rect(x,y,GW,GH);
-   try{doc.addImage(r.photo,"JPEG",x+(GW-w)/2,y+(GH-h)/2,w,h,undefined,"FAST")}catch(e){}
-   doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(27,32,41);doc.text(doc.splitTextToSize(PTX(eqTitle(s,i)),GW).slice(0,1),x,y+GH+11);
+   let rec=null;try{rec=await dbGet(p.id)}catch(e){}
+   const buf=rec&&(rec.prev||rec.full);
+   if(buf){const ar=(p.w||4)/(p.h||3),k2=Math.min(GW/ar,GH),h=k2,w=k2*ar;try{doc.addImage(new Uint8Array(buf),"JPEG",x+(GW-w)/2,y+(GH-h)/2,w,h,undefined,"FAST")}catch(e){}}
+   else{doc.setFont("helvetica","normal");doc.setFontSize(9);doc.setTextColor(150,150,150);doc.text("Photo unavailable",x+GW/2,y+GH/2,{align:"center"})}
+   rec=null;
+   doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(27,32,41);doc.text(doc.splitTextToSize(PTX(eqTitle(s,i)+" - Photo "+(k+1)+" of "+n),GW).slice(0,1),x,y+GH+11);
    doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(95,107,124);doc.text(doc.splitTextToSize(PTX(eqMeta(r)+(val(r.serial)?" | S/N: "+val(r.serial):"")),GW).slice(0,2),x,y+GH+22);
    if(col===1||j===f.length-1)y+=GH+44}
   y+=4}
  if(!any)P("No equipment photos captured yet.");
-
- /* 7. Recommendations */
- H2("7. Recommendations");
- rc.forEach((x,i)=>P(`${i+1}. [${PL[x.p]}] ${x.t}`,{ind:6,gap:3}));
 
  /* header / footer / page numbers on every page */
  const N=doc.internal.getNumberOfPages();
@@ -586,18 +697,25 @@ function pdfShare(){
 
 /* ---------- Export ---------- */
 function dl(n,t,m){const u=URL.createObjectURL(new Blob([t],{type:m})),a=document.createElement("a");a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}
-function exp(){dl("power-distribution-survey.json",JSON.stringify({S}),"application/json")}
+async function exp(){
+ toast("Preparing backup (includes all photos)...");
+ const parts=[new Blob(['{"S":'+JSON.stringify(S)+',"photos":{'])];let first=true;
+ try{if(DB)for(const s of S.subs)for(const e of s.equipment)for(const p of (e.photos||[])){const r=await dbGet(p.id);if(!r||!r.full)continue;
+  const du=await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>rej(fr.error);fr.readAsDataURL(bufBlob(r.full))});
+  parts.push(new Blob([(first?"":",")+JSON.stringify(p.id)+":"+JSON.stringify(du)]));first=false}}catch(e){console.error(e)}
+ parts.push(new Blob(["}}"]));dl("power-distribution-survey-backup.json",new Blob(parts),"application/json");toast("Backup ready")}
 function csv(){
  const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"',
- H=["Substation Name","Substation Code","Latitude","Longitude","Equipment Type","Manufacturer","Model","Serial Number","Rating","Remarks","Photo Available","Address","GPS Accuracy (m)","Tag / Name","Communication","Condition"],rows=[];
+ H=["Substation Name","Substation Code","Latitude","Longitude","Equipment Type","Manufacturer","Model","Serial Number","Rating","Remarks","Photo Available","Address","Barangay","Town / City","Province","GPS Accuracy (m)","Tag / Name","Communication","Condition","Substation Rating","Incoming Feeders","Outgoing Feeders","Photo Count"],rows=[];
  S.subs.forEach(s=>{const b=[s.name,s.code,s.lat,s.lng];
-  if(!s.equipment.length)rows.push(b.concat(["","","","","","","",s.address,s.acc,"","",""]));
-  s.equipment.forEach(r=>rows.push(b.concat([dispT(r),r.mf,r.model,r.serial,r.rating,r.remarks,hasPh(r)?"Yes":"No",s.address,s.acc,r.tag||"",(r.proto||[]).join("; "),r.cond||""])))});
+  if(!s.equipment.length)rows.push(b.concat(["","","","","","","",fullAddr(s),s.barangay,s.town,s.province,s.acc,"","","",s.rating,s.feedIn,s.feedOut,""]));
+  s.equipment.forEach(r=>rows.push(b.concat([dispT(r),r.mf,r.model,r.serial,r.rating,r.remarks,hasPh(r)?"Yes":"No",fullAddr(s),s.barangay,s.town,s.province,s.acc,r.tag||"",(r.proto||[]).join("; "),r.cond||"",s.rating,s.feedIn,s.feedOut,phCount(r)])))});
  dl("power-distribution-equipment.csv","\uFEFF"+[H.map(q).join(",")].concat(rows.map(r=>r.map(q).join(","))).join("\r\n"),"text/csv")}
-function doReset(){ask("reset",()=>{S={tab:"Overview",info:{date:today},subs:[],op:{},master:{name:"",address:"",lat:"",lng:"",acc:""}}})}
+function doReset(){ask("reset",()=>{S={tab:"Overview",info:{date:today,assist:[]},subs:[],op:{},master:{name:"",address:"",barangay:"",town:"",province:"",lat:"",lng:"",acc:""}}})}
 function R(){const y=window.scrollY;nav();killMap();document.getElementById("m").innerHTML=view();if(S.tab==="Report")initMap();window.scrollTo(0,y)}
 let PT=null;
 addEventListener("beforeprint",()=>{if(S.tab!="Report"){PT=S.tab;S.tab="Report";R()}else if(MAP)MAP.invalidateSize()});
 addEventListener("afterprint",()=>{if(PT){S.tab=PT;PT=null;R()}});
 R();
+initPhotos();
 </script></body></html>
