@@ -112,7 +112,7 @@ ol.recs{padding-left:20px}ol.recs li{margin:7px 0}
 .maplg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;margin:4px 0 10px}
 .maplg span{display:inline-flex;align-items:center;gap:6px}.maplg .pin{width:20px;height:20px;font-size:11px;border-width:1px}.maplg .pin.m{width:22px;height:22px;font-size:12px}
 @media print{.mapbox{height:3.7in;break-inside:avoid}.leaflet-control-container{display:none}}
-.dlg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}.dlgb{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;max-width:380px;width:100%}.dlgb .btn{margin:4px 4px 0 0}@media print{.dlg{display:none!important}}
+.dlg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}.dlgb{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;max-width:380px;width:100%}.dlgb .btn{margin:4px 4px 0 0}.btn.danger{border-color:var(--no);color:var(--no)}@media print{.dlg{display:none!important}}
 
 /* ---- v3: multi-photo, personnel, photo viewer ---- */
 .phg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
@@ -169,7 +169,7 @@ let S={tab:"Overview",info:{date:today,assist:[]},subs:[],op:{},master:{name:"",
 try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
 const val=v=>String(v??"").trim();
 const OLDT=["Power Transformer","Distribution Transformer","Circuit Breaker","Recloser","Protection Relay","Revenue Meter","Capacitor Bank","Battery Bank","Station Generator","Surge Arrester","Other Equipment"];
-(function migrate(){
+function migrateState(){
  if(!Array.isArray(S.subs))S.subs=[];
  if(!S.info)S.info={date:today};
  S.info.assist=(Array.isArray(S.info.assist)?S.info.assist:[]).map(p=>typeof p==="string"?{name:p,role:""}:{name:(p&&p.name)||"",role:(p&&p.role)||""});
@@ -197,7 +197,8 @@ const OLDT=["Power Transformer","Distribution Transformer","Circuit Breaker","Re
    ["make","makeOther","pn","cap","age","integ","rec"].forEach(k=>delete e[k]);
   });
  });
-})();
+}
+migrateState();
 let ST=null,SWARN=0;
 function saveNow(){clearTimeout(ST);try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){if(!SWARN++||SWARN%10==0)toast("Could not save: browser storage is full. Export a backup and free some space.");return false}}
 function save(){clearTimeout(ST);ST=setTimeout(saveNow,350)}
@@ -314,9 +315,9 @@ async function processImage(file,o){o=o||{};
  const {im,u}=d,nw=im.naturalWidth,nh=im.naturalHeight;
  const mk=async(src,sw,sh,max,q)=>{const k=Math.min(1,max/Math.max(sw,sh)),w=Math.max(1,Math.round(sw*k)),h=Math.max(1,Math.round(sh*k)),c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(src,0,0,w,h);return{c,w,h,blob:await toBlobJ(c,q)}};
  let F=null,P=null;
- try{F=await mk(im,nw,nh,o.fullPx||FULLPX,o.fullQ||0.8);P=await mk(F.c,F.w,F.h,o.prevPx||PREVPX,o.prevQ||0.72)}
+ try{if(o.keep)P=await mk(im,nw,nh,o.prevPx||PREVPX,o.prevQ||0.72);else{F=await mk(im,nw,nh,o.fullPx||FULLPX,o.fullQ||0.8);P=await mk(F.c,F.w,F.h,o.prevPx||PREVPX,o.prevQ||0.72)}}
  finally{try{URL.revokeObjectURL(u)}catch(e){}im.src="";if(F)F.c.width=F.c.height=0;if(P)P.c.width=P.c.height=0}   /* free canvas memory (important on iPad) */
- return{full:await blobBuf(F.blob),prev:await blobBuf(P.blob),w:F.w,h:F.h}}
+ return o.keep?{full:await blobBuf(file),prev:await blobBuf(P.blob),w:nw,h:nh}:{full:await blobBuf(F.blob),prev:await blobBuf(P.blob),w:F.w,h:F.h}}
 
 /* ---- add / replace / remove ---- */
 function photosIn(si,ei,inp,rep){
@@ -542,6 +543,8 @@ async function viewArch(){
  let d=document.getElementById("phdlg");if(!d){d=document.createElement("div");d.id="phdlg";d.className="dlg";document.body.appendChild(d)}
  d.innerHTML=`<div class="dlgb phb"><div class="desc">System architecture diagram</div><img id="phfull" alt="" src="${PU[a.id]||""}"><div><button class="btn primary" onclick="closePhoto()">Close</button></div></div>`;d.style.display="flex";
  try{const r=await dbGet(a.id);if(r&&r.full){if(LBU)URL.revokeObjectURL(LBU);LBU=URL.createObjectURL(bufBlob(r.full));const im=document.getElementById("phfull");if(im)im.src=LBU}}catch(x){}}
+function backupCard(){return`<div class="card"><h2>💾 Backup &amp; Restore</h2><p class="desc">Export saves all survey data, photos and the architecture diagram into one JSON file. Import reads a backup file back in, including older backups.</p>
+<button class="chip cta" onclick="exp()">⬇ Export Backup</button><label class="chip">⬆ Import Backup (JSON)<input class="fi" type="file" accept=".json,application/json,text/plain" onchange="impIn(this)"></label></div>`}
 function archCard(){const a=S.info.arch,u=a&&PU[a.id];
  return`<div class="card"><h2>🗺️ System Architecture Diagram</h2><p class="desc">Attach your system architecture diagram (JPG or PNG). It appears at the very bottom of the Report and in the PDF.</p>
 ${a?`<div class="archp">${u?`<img alt="System architecture diagram" src="${u}" onclick="viewArch()">`:`<div class="pv0">Loading…</div>`}</div><p class="desc">${esc(a.name||"diagram")}</p><div class="lb">Caption (optional)</div><input type="text" placeholder="e.g. Figure 1. High-Level System Architecture" value="${esc(a.caption)}" oninput="S.info.arch.caption=this.value;save()">`:`<div class="pv0">No diagram attached yet.</div>`}
@@ -559,6 +562,7 @@ function view(){
 ${assistCard()}
 ${masterCard()}
 ${archCard()}
+${backupCard()}
 <div class="card"><h2>Dashboard</h2><div class="stats"><div class="stat"><b>${a.nS}</b>Total Substations</div><div class="stat"><b>${a.nE}</b>Total Equipment</div><div class="stat"><b>${a.gpsN}/${a.nS}</b>GPS Captured</div><div class="stat"><b>${a.photoTotal}</b>Photos Captured</div></div>${a.nS?`<div class="lb">Substations</div>${S.subs.map((s,i)=>`<button class="subrow" onclick="S.tab='Equipment';S.op['s${s.id}']=true;saveNow();R();window.scrollTo(0,0)"><span>📍 ${esc(subName(s))}<br><span class="smeta">${gpsLine(s)}${val(s.rating)?" · Rating: "+esc(val(s.rating)):""} · Feeders: ${esc(feedTxt(s))}</span></span><span class="cnt">${s.equipment.length} Equipment</span></button>`).join("")}`:`<p class="desc">No substations yet. Open the Equipment tab and tap + Add Substation.</p>`}</div>
 ${SINFO?`<div class="card"><p class="desc">${esc(SINFO)}</p></div>`:""}`}
  if(S.tab==="Equipment")return`<div class="card"><h2>Substations</h2><div style="margin-top:10px"><button class="chip cta" onclick="addSub()">+ Add Substation</button><button class="chip" onclick="csv()">Export CSV</button></div></div>`+(S.subs.length?S.subs.map((s,i)=>subCard(i)).join(""):`<div class="card"><p class="desc">No substations yet. Tap <b>+ Add Substation</b> to begin.</p></div>`);
@@ -586,7 +590,7 @@ ${rd("Data Collection Readiness",a.dcL,a.nS?`GPS recorded at ${a.gpsN} of ${a.nS
  const ph=S.subs.map(s=>{const f=[];s.equipment.forEach((r,i)=>(r.photos||[]).forEach((p,k)=>f.push({r,i,p,k,n:r.photos.length})));return f.length?`<div class="lb"><b>${esc(subName(s))}</b></div><div class="pgrid">${f.map(({r,i,p,k,n})=>`<figure class="pfig">${PU[p.id]?`<img alt="" src="${PU[p.id]}">`:`<div class="phl" style="height:190px;display:flex;align-items:center;justify-content:center">Loading…</div>`}<figcaption><b>${esc(eqTitle(s,i))}</b> · Photo ${k+1} of ${n}<br>${esc(eqMeta(r))}${val(r.serial)?" · S/N: "+esc(val(r.serial)):""}</figcaption></figure>`).join("")}</div>`:""}).join("");
  const photos=sec(6,"Equipment Photos",ph||"<p>No equipment photos captured yet.</p>",1);
  const A_=S.info.arch,arch=A_&&A_.id?sec(7,"System Architecture",`<figure class="archfig">${PU[A_.id]?`<img alt="System architecture diagram" src="${PU[A_.id]}">`:`<div class="phl">Loading…</div>`}</figure>`+(val(A_.caption)?`<p class="figcap">${esc(val(A_.caption))}</p>`:""),1):"";
- return cover+exec+subSum+analysis+inv+gp+photos+arch+`<div class="card noprint"><button class="btn primary" onclick="savePdf()">Save as PDF</button> <button class="btn" onclick="window.print()">Print</button> <button class="btn" onclick="csv()">Export CSV</button> <button class="btn" onclick="exp()">Export backup</button><p class="desc">Tip: <b>Save as PDF</b> builds a real PDF file you can save to Files, share or email (works on iPad, iPhone and desktop). The map needs an internet connection.</p></div>`}
+ return cover+exec+subSum+analysis+inv+gp+photos+arch+`<div class="card noprint"><button class="btn primary" onclick="savePdf()">Save as PDF</button> <button class="btn" onclick="window.print()">Print</button> <button class="btn" onclick="csv()">Export CSV</button> <button class="btn" onclick="exp()">Export backup</button> <button class="btn" onclick="S.tab='Overview';saveNow();R();window.scrollTo(0,0)">Import backup…</button><p class="desc">Tip: <b>Save as PDF</b> builds a real PDF file you can save to Files, share or email (works on iPad, iPhone and desktop). The map needs an internet connection.</p></div>`}
 
 /* ---------- PDF export (jsPDF + autoTable; works on iPad / iPhone / desktop) ---------- */
 const PTX=s=>String(s??"").replace(/[\u2013\u2014]/g,"-").replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/\u2022/g,"-").replace(/[★✔✖]/g,"").replace(/[^\x09\x0A\x20-\x7E\xA0-\xFF]/g,"?").trim();
@@ -735,11 +739,68 @@ function pdfShare(){
 function dl(n,t,m){const u=URL.createObjectURL(new Blob([t],{type:m})),a=document.createElement("a");a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}
 async function exp(){
  toast("Preparing backup (includes all photos)...");
- const parts=[new Blob(['{"S":'+JSON.stringify(S)+',"photos":{'])];let first=true;
- try{if(DB)for(const s of S.subs)for(const e of s.equipment)for(const p of (e.photos||[])){const r=await dbGet(p.id);if(!r||!r.full)continue;
+ const parts=[new Blob(['{"app":"cpd-site-survey","version":3,"exported":"'+new Date().toISOString()+'","S":'+JSON.stringify(S)+',"photos":{'])];let first=true;
+ try{if(DB)for(const id of phIds()){const r=await dbGet(id);if(!r||!r.full)continue;
   const du=await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>rej(fr.error);fr.readAsDataURL(bufBlob(r.full))});
-  parts.push(new Blob([(first?"":",")+JSON.stringify(p.id)+":"+JSON.stringify(du)]));first=false}}catch(e){console.error(e)}
+  parts.push(new Blob([(first?"":",")+JSON.stringify(id)+":"+JSON.stringify(du)]));first=false}}catch(e){console.error(e)}
  parts.push(new Blob(["}}"]));dl("power-distribution-survey-backup.json",new Blob(parts),"application/json");toast("Backup ready")}
+
+/* ---------- Import (reads the JSON backup file) ---------- */
+let IMP=null,IMPB=false;
+const readText=f=>f.text?f.text():new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsText(f)});
+function dataUrlBlob(u){const i=u.indexOf(","),meta=u.slice(5,i),b=atob(u.slice(i+1)),a=new Uint8Array(b.length);for(let k=0;k<b.length;k++)a[k]=b.charCodeAt(k);return new Blob([a],{type:meta.split(";")[0]||"image/jpeg"})}
+function parseBackup(txt){
+ let j;try{j=JSON.parse(txt)}catch(e){throw new Error("This file is not valid JSON.")}
+ const st=j&&typeof j==="object"&&j.S&&typeof j.S==="object"?j.S:j;
+ if(!st||typeof st!=="object"||Array.isArray(st)||(!Array.isArray(st.subs)&&!Array.isArray(st.eq)))throw new Error("This JSON file does not look like a site survey backup (no substations found).");
+ const isO=x=>x&&typeof x==="object"&&!Array.isArray(x),photos=isO(j.photos)?j.photos:{};
+ const raw={tab:"Overview",info:isO(st.info)?st.info:{},op:{},master:isO(st.master)?st.master:{},eq:Array.isArray(st.eq)?st.eq.filter(isO):undefined,
+  subs:(Array.isArray(st.subs)?st.subs:[]).filter(isO).map(s=>Object.assign({},s,{id:String(s.id||uid()),equipment:(Array.isArray(s.equipment)?s.equipment:[]).filter(isO).map(e=>Object.assign({},e,{id:String(e.id||uid())}))}))};
+ const bak=S;let cand;
+ try{S=raw;migrateState();cand=S}catch(e){throw new Error("The survey data in this file is damaged.")}finally{S=bak}
+ const refs=new Set();cand.subs.forEach(s=>s.equipment.forEach(e=>(e.photos||[]).forEach(p=>p&&p.id&&refs.add(p.id))));
+ if(cand.info.arch&&cand.info.arch.id)refs.add(cand.info.arch.id);else cand.info.arch=null;
+ return{cand,photos,refs,nS:cand.subs.length,nE:cand.subs.reduce((t,s)=>t+s.equipment.length,0),nP:refs.size,nHave:[...refs].filter(id=>typeof photos[id]==="string"&&photos[id].indexOf("data:image/")===0).length,arch:!!cand.info.arch}}
+async function impIn(inp){
+ const f=inp.files&&inp.files[0];inp.value="";if(!f)return;
+ if(IMPB){toast("An import is already running.");return}
+ toast("Reading "+f.name+"...");
+ try{const P=parseBackup(await readText(f));P.name=f.name;IMP=P;impDialog();toast("File read: "+P.nS+" substation(s) found")}
+ catch(e){toast("Import failed: "+(e&&e.message||e))}}
+function closeImp(){const d=document.getElementById("impdlg");if(d)d.style.display="none"}
+function impDialog(){const P=IMP;let d=document.getElementById("impdlg");if(!d){d=document.createElement("div");d.id="impdlg";d.className="dlg";document.body.appendChild(d)}
+ const has=S.subs.length>0;
+ d.innerHTML=`<div class="dlgb"><h2>Import backup</h2><p class="desc">${esc(P.name)}</p>
+<p class="desc">Contains <b>${P.nS}</b> substation(s), <b>${P.nE}</b> equipment record(s) and <b>${P.nHave}</b> photo(s)${P.arch?", plus a system architecture diagram":""}.${P.nP>P.nHave?" "+(P.nP-P.nHave)+" photo(s) are not included in the file and will be skipped.":""}</p>
+${has?`<p class="desc">This device already has <b>${S.subs.length}</b> substation(s).</p><p class="desc"><b>Add to current data</b> keeps what you have and adds the imported substations. <b>Replace</b> erases the current survey data first.</p><button class="btn primary" onclick="doImport('merge')">Add to current data</button> <button class="btn danger" onclick="doImport('replace')">Replace current data</button>`:`<button class="btn primary" onclick="doImport('replace')">Import</button>`} <button class="btn" onclick="closeImp()">Cancel</button></div>`;d.style.display="flex"}
+async function doImport(mode){
+ const P=IMP;if(!P||IMPB)return;IMPB=true;closeImp();
+ try{
+  if(!DB)throw new Error("Photo storage is not available in this browser.");
+  const cand=P.cand,idMap={},ids=[...P.refs];let n=0,miss=0;
+  for(const oid of ids){n++;toast("Importing photos ("+n+" of "+ids.length+")...");
+   const du=P.photos[oid];if(typeof du!=="string"||du.indexOf("data:image/")!==0){miss++;continue}
+   try{const ia=cand.info.arch&&cand.info.arch.id===oid,r=await processImage(dataUrlBlob(du),{keep:true,prevPx:ia?1400:PREVPX,prevQ:ia?0.82:0.72}),nid=ia?"arch"+uid():uid()+"p";
+    await dbPut({id:nid,full:r.full,prev:r.prev,w:r.w,h:r.h,at:Date.now()});idMap[oid]=nid;PU[nid]=URL.createObjectURL(bufBlob(r.prev))}catch(e){miss++}
+   await new Promise(r=>setTimeout(r,20))}
+  cand.subs.forEach(s=>s.equipment.forEach(e=>{e.photos=(e.photos||[]).filter(p=>p&&idMap[p.id]).map(p=>Object.assign({},p,{id:idMap[p.id]}))}));
+  const A=cand.info.arch;if(A){if(idMap[A.id])A.id=idMap[A.id];else cand.info.arch=null}
+  if(mode==="replace"){S=Object.assign({},cand,{tab:"Overview",op:{}});migrateState()}
+  else{
+   const sid=new Set(S.subs.map(s=>s.id)),eid=new Set(S.subs.flatMap(s=>s.equipment.map(e=>e.id)));
+   cand.subs.forEach(s=>{if(sid.has(s.id))s.id=uid();s.equipment.forEach(e=>{if(eid.has(e.id))e.id=uid()})});
+   S.subs.push(...cand.subs);
+   ["client","site","who","date"].forEach(k=>{if(!val(S.info[k])&&val(cand.info[k]))S.info[k]=cand.info[k]});
+   const have=new Set(S.info.assist.map(p=>val(p.name).toLowerCase()));
+   (cand.info.assist||[]).forEach(p=>{const k=val(p.name).toLowerCase();if(k&&!have.has(k)){S.info.assist.push(p);have.add(k)}});
+   if(!val(S.master.name)&&!hasGps(S.master)&&(val(cand.master.name)||hasGps(cand.master)))S.master=cand.master;
+   if(!S.info.arch&&cand.info.arch)S.info.arch=cand.info.arch}
+  await migrateLegacyPhotos();
+  saveNow();storageInfo();R();
+  toast("Imported "+P.nS+" substation(s) and "+(P.nHave-miss<0?0:ids.length-miss)+" photo(s)"+(miss?" ("+miss+" photo(s) could not be imported)":""))}
+ catch(e){console.error(e);toast("Import failed: "+(e&&e.message||e))}
+ finally{IMPB=false;IMP=null;gcSoon()}}
+
 function csv(){
  const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"',
  H=["Substation Name","Substation Code","Latitude","Longitude","Equipment Type","Manufacturer","Model","Serial Number","Rating","Remarks","Photo Available","Address","Barangay","Town / City","Province","GPS Accuracy (m)","Tag / Name","Communication","Condition","Substation Rating","Incoming Feeders","Outgoing Feeders","Photo Count"],rows=[];
